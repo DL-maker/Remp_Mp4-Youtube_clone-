@@ -11,7 +11,7 @@ export default function Home() {
         </div>
         
         <div className="flex max-w-xs itemsStretch rounded-b-lg bg-gray-400 mb-4">
-          <Image className="rounded-full w-[50px] h-[50px] mt-2 mb-2 mr-1 ml-2" src={"https://thispersondoesnotexist.com?" }  alt="Profile" width={50} height={50}/>
+          <Image className="rounded-full w-[50px] h-[50px] mt-2 mb-2 mr-1 ml-2" src={"https://thispersondoesnotexist.com?" + new Date().getTime()}  alt="Profile" width={50} height={50}/>
           <Image className="max-w-xs mt-2 mb-2 mr-3 ml-1" src="/Video_indisponible.png" alt="Photo video" width={175} height={350} /><br/>
           <p className='justify-center items-center' >Titre : Shif ... Shif...</p>
         </div>

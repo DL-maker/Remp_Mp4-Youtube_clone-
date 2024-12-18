@@ -20,9 +20,9 @@ export default function Navbar() {
               className="px-3 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
             />
             
-            <Link href="/login/login">
+            <Link href="/login" prefetch={false}>
               <img
-                src={"https://thispersondoesnotexist.com?"}
+                src={"https://thispersondoesnotexist.com"}
                 alt="Profile"
                 className="rounded-full h-10 w-10 object-cover cursor-pointer"
               />
