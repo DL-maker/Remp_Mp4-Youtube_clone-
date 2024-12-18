@@ -3,7 +3,7 @@ import Image from 'next/image';
 import ColumnOfVideo from "@/components/column_of_video";
 
 export default function Home() {
-  return (
+  return ( // children page of the application composed of columns of videos (infinite loupe) and subscribe and status buttons
     <div className="flex">  
       <div className="w-1/4 container mx-auto bg-gray-600 p-4 rounded-lg"> 
         <div className="max-w-xs rounded-t-lg flex justify-center items-center bg-gray-500">
@@ -35,7 +35,7 @@ export default function Home() {
 }
 
 export function AbonnementBoutton() {
-  return (
+  return ( // button to subscribe to the channel of the video creator
     <div className='bg-gray-500'>
       <button className="flex-1 px-4 py-2 text-center hover:bg-gray-200 rounded-md transition-colors duration-200 focus:outline-none flex">
         <span className="flex-1">Abonnement</span>
@@ -45,7 +45,7 @@ export function AbonnementBoutton() {
 }
 
 export function StateBoutton() {
-  return (
+  return ( // button to like or dislike the video
     <div>
       <div>
         <button className="flex-1 px-4 py-2 text-center hover:bg-gray-200 rounded-md transition-colors duration-200 focus:outline-none flex">

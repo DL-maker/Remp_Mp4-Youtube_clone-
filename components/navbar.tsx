@@ -3,7 +3,7 @@ import React from 'react';
 import Link from 'next/link';
 
 export default function Navbar() {
-  return (
+  return ( // Navbar component for the app layout 
     <nav className="bg-white shadow-sm">
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between mb-4">

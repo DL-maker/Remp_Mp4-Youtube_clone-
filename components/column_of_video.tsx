@@ -3,12 +3,12 @@ import React, { useState, useEffect, useRef } from 'react';
 import Image from 'next/image';
 
 
-const ColumnOfVideo = () => {   // Pour chaque video existe un id unique
+const ColumnOfVideo = () => {   // For each video there is a unique ID
   const [videos, setVideos] = useState<Array<{ id: number }>>([]);
   const [loading, setLoading] = useState(false);
   const observerTarget = useRef(null);
 
-  useEffect(() => { // Pour dectecter le changement de la taille de la page
+  useEffect(() => { // Load more videos when the observer target is in view
     const loadMoreVideos = () => {
       setLoading(true);
       const newVideos = [...Array(6)].map((_, index) => ({
@@ -18,7 +18,7 @@ const ColumnOfVideo = () => {   // Pour chaque video existe un id unique
       setLoading(false);
     };
 
-    const observer = new IntersectionObserver( // e
+    const observer = new IntersectionObserver( // Create an observer to watch the observer target
       entries => { 
         if (entries[0].isIntersecting && !loading) {
           loadMoreVideos();
