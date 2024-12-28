@@ -1,8 +1,15 @@
 import React from 'react';
 import Image from 'next/image';
 import ColumnOfVideo from "@/components/column_of_video";
+import { verifySession } from "@/app/_lib/session"
 
-export default function Home() {
+export default async function Home() {
+  const session = await verifySession()
+  if (typeof session === 'object' && 'role' in session) {
+    const role = session.role;
+    if (role === 'LD_ADMIN') {
+    }
+  }
   return ( // children page of the application composed of columns of videos (infinite loupe) and subscribe and status buttons
     <div className="flex">  
       <div className="w-1/4 container mx-auto bg-gray-600 p-4 rounded-lg"> 

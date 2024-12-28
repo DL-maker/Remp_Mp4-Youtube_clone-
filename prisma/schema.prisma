@@ -1,71 +1,72 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
+// This is your Prisma schema file
+generator client {
+  provider = "prisma-client-js"
+}
 
-// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
-// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
 
+model User {
+  id          String       @id @default(cuid())
+  username    String       @unique
+  email       String       @unique
+  passwordHash String
+  role        Role        @default(USER)           // Nouveau champ
+  createdAt   DateTime     @default(now())
+  videos      Video[]
+  likesDislikes LikeDislike[]
+  comments    Comment[]
+  subscriptionsFrom Subscription[] @relation("subscriptionsFrom")
+  subscriptionsTo   Subscription[] @relation("subscriptionsTo")
+}
 
-  generator client {
-    provider = "prisma-client-js"
-  }
+// Nouveau type enum pour les rôles
+enum Role {
+  USER
+  ADMIN
+}
 
-  datasource db {
-    provider  = "postgresql"
-    url       = env("DATABASE_URL")
-    directUrl = env("DIRECT_URL")
-  }
+model Video {
+  id           String       @id @default(cuid())
+  title        String
+  description  String?
+  url          String       @unique
+  thumbnailUrl String?
+  publishedAt  DateTime     @default(now())
+  userId       String
+  user         User         @relation(fields: [userId], references: [id])
+  likesDislikes LikeDislike[]
+  comments     Comment[]
+}
 
-  model User {
-    id          String       @id @default(cuid()) // Identifiant unique
-    username    String    @unique                      // Nom d'utilisateur unique
-    email       String    @unique                      // Email unique
-    passwordHash String    // Mot de passe haché
-    createdAt   DateTime  @default(now())              // Date de création
-    videos      Video[]                                // Relation avec les vidéos
-    likesDislikes LikeDislike[]                        // Relation avec les likes/dislikes
-    comments    Comment[]                              // Relation avec les commentaires
-    subscriptionsFrom Subscription[] @relation("subscriptionsFrom")
-    subscriptionsTo   Subscription[] @relation("subscriptionsTo")
-  }
+model LikeDislike {
+  id        String      @id @default(cuid())
+  isLike    Boolean
+  createdAt DateTime    @default(now())
+  userId    String
+  videoId   String
+  user      User        @relation(fields: [userId], references: [id])
+  video     Video       @relation(fields: [videoId], references: [id])
+}
 
-  model Video {
-    id           String       @id @default(cuid())  // Identifiant unique
-    title        String                                    // Titre de la vidéo
-    description  String?                                   // Description (nullable)
-    url          String    @unique                        // URL unique de la vidéo
-    thumbnailUrl String?                                   // URL de la miniature
-    publishedAt  DateTime  @default(now())                // Date de publication
-    userId       String                                       // Clé étrangère vers User
-    user         User      @relation(fields: [userId], references: [id])
-    likesDislikes LikeDislike[]                           // Relation avec les likes/dislikes
-    comments     Comment[]                                // Relation avec les commentaires
-  }
+model Comment {
+  id        String      @id @default(cuid())
+  content   String
+  createdAt DateTime    @default(now())
+  userId    String
+  videoId   String
+  user      User        @relation(fields: [userId], references: [id])
+  video     Video       @relation(fields: [videoId], references: [id])
+}
 
-  model LikeDislike {
-    id        String      @id @default(cuid())       // Identifiant unique
-    isLike    Boolean                                     // `true` pour un like, `false` pour un dislike
-    createdAt DateTime @default(now())                   // Date d'ajout
-    userId    String                                        // Clé étrangère vers User
-    videoId   String                                        // Clé étrangère vers Video
-    user      User     @relation(fields: [userId], references: [id])
-    video     Video    @relation(fields: [videoId], references: [id])
-  }
-
-  model Comment {
-    id        String      @id @default(cuid())       // Identifiant unique
-    content   String                                     // Contenu du commentaire
-    createdAt DateTime @default(now())                   // Date de création
-    userId    String                                        // Clé étrangère vers User
-    videoId   String                                        // Clé étrangère vers Video
-    user      User     @relation(fields: [userId], references: [id])
-    video     Video    @relation(fields: [videoId], references: [id])
-  }
-
-  model Subscription {
-    id              String      @id @default(cuid()) // Identifiant unique
-    subscriberId    String                                     // ID de l'utilisateur abonné
-    subscribedToId  String                                     // ID de l'utilisateur suivi
-    createdAt       DateTime @default(now())               // Date de création
-    subscriber      User     @relation("subscriptionsFrom", fields: [subscriberId], references: [id])
-    subscribedTo    User     @relation("subscriptionsTo", fields: [subscribedToId], references: [id])
-  }
+model Subscription {
+  id              String      @id @default(cuid())
+  subscriberId    String
+  subscribedToId  String
+  createdAt       DateTime    @default(now())
+  subscriber      User        @relation("subscriptionsFrom", fields: [subscriberId], references: [id])
+  subscribedTo    User        @relation("subscriptionsTo", fields: [subscribedToId], references: [id])
+}
