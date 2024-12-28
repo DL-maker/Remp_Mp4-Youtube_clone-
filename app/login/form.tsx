@@ -1,5 +1,6 @@
 'use client';
-import { useFormState, useFormStatus } from "react-dom";
+import { useActionState } from "react";  // Changement ici
+import { useFormStatus } from "react-dom";  // Changement ici
 import { signup } from './actions';
 
 function SubmitButton() {
@@ -17,7 +18,7 @@ function SubmitButton() {
 
 export function SignUpForm() {
   const initialState = { error: {} };
-  const [state, action] = useFormState(signup, initialState);
+  const [state, action] = useActionState(signup, initialState);  // Changement ici
 
   return (
     <div className="w-full max-w-md">
