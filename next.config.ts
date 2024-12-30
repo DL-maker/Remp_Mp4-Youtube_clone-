@@ -6,7 +6,11 @@ const nextConfig: NextConfig = {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "thispersondoesnotexist.com",
+        hostname: "thispersondoesnotexist.com",// this is a fake person generator
+      },
+      {
+        protocol: "http",
+        hostname: "test.com", // ...
       }
     ],
   }
