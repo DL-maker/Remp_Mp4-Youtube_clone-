@@ -4,14 +4,25 @@ import { useFormStatus } from "react-dom";
 import { signup } from './actions';
 
 // Définition des types
-interface SignupState {
-  error: {
-    username?: string[];
-    email?: string[];
-    password?: string[];
-  };
+
+export interface SignupState {
+
+  error?: Record<string, string[]>;
+
   success?: boolean;
+
+  user?: {
+
+    id: string;
+
+    username: string;
+
+    email: string;
+
+  };
+
 }
+
 
 // Wrapper pour l'action signup
 const signupAction = async (state: SignupState, formData: FormData): Promise<SignupState> => {

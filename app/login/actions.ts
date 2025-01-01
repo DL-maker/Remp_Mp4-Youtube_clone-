@@ -1,59 +1,96 @@
 'use server';
-
+import { NextResponse } from 'next/server';
 import { SignupForumSchema } from "@/app/_lib/definitions";
+import bcrypt from 'bcrypt';
 import { prisma } from '@/lib/prisma';
-import bcrypt from "bcrypt";
 import { createSession } from "@/app/_lib/session";
 
-interface SignupState {
-  error?: {
-    username?: string[];
-    email?: string[];
-    password?: string[];
-  };
-  success?: boolean;
-  user?: {
-    id: string;
-    username: string;
-    email: string;
-  };
+interface SignupSuccess {
+  success: true;
+  redirectUrl: string;
 }
 
-export async function signup(formData: FormData): Promise<SignupState> {
+interface SignupError {
+  success: false;
+  error: {
+    username?: string[];
+    email?: string[];
+  };
+}
+type SignupResult = SignupSuccess | SignupError;
+
+export async function signup(formData: FormData, baseUrl: string): Promise<SignupResult> {
   try {
+    // Récupération des données du formulaire
     const username = formData.get('username') as string;
     const email = formData.get('email') as string;
     const password = formData.get('password') as string;
-    // Validate the form data
+
+    // Validation des données
     const validationResult = SignupForumSchema.safeParse({ username, email, password });
     if (!validationResult.success) {
-      return { error: validationResult.error.flatten().fieldErrors };
+      console.log('Validation failed:', validationResult.error.flatten());
+      return {
+        success: false,
+        error: validationResult.error.flatten().fieldErrors,
+      };
     }
-    // Destructure the valid data
-    const { username: validUsername, email: validEmail, password: validPassword } = validationResult.data;
 
-    const hashedPassword = await bcrypt.hash(validPassword, 10);
-    const user = await prisma.user.create({
-      data: {
-        username: validUsername,
-        email: validEmail,
-        passwordHash: hashedPassword,
-      },
-      select: {
-        id: true,
-        username: true,
-        email: true,
+    // Vérification si l'utilisateur existe déjà
+    const existingUser = await prisma.user.findFirst({
+      where: {
+        OR: [{ username }, { email }],
       },
     });
-    // Create a session
-    await createSession(user.id);
-    return { success: true, user };
+
+    if (existingUser) {
+      console.log('User exists:', existingUser);
+      return {
+        success: false,
+        error: {
+          username: existingUser.username === username ? ['Username already taken'] : undefined,
+          email: existingUser.email === email ? ['Email already taken'] : undefined,
+        },
+      };
+    }
+
+    // Hash du mot de passe
+    const hashedPassword = await bcrypt.hash(password, 10);
+
+    // Création de l'utilisateur dans la base de données
+    const user = await prisma.user.create({
+      data: { username, email, passwordHash: hashedPassword },
+      select: { id: true, username: true, email: true },
+    });
+
+    console.log('User created:', user);
+
+    // Tentative de création de la session
+    try {
+      await createSession(user.id);
+      console.log('Session created for user:', user.id);
+    } catch (sessionError) {
+      console.error('Session creation failed:', sessionError);
+      return {
+        success: false,
+        error: {
+          username: ['Failed to create session. Please try again.'],
+        },
+      };
+    }
+
+    // Redirection vers le profil après la création
+    const absoluteUrl = `${baseUrl}/profile`;
+    return {
+      success: true,
+      redirectUrl: absoluteUrl,
+    };
+
   } catch (error) {
     console.error('Signup error:', error);
     return {
-      error: {
-        username: ['An error occurred during signup'],
-      },
+      success: false,
+      error: { username: ['An unexpected error occurred. Please try again.'] },
     };
   }
 }

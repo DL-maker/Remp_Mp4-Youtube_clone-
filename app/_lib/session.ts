@@ -56,7 +56,8 @@ export async function createSession(userId: string): Promise<NextResponse> {
     expires
   });
   
-  return NextResponse.redirect('/login', 302);
+  const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+  return NextResponse.redirect(`${baseUrl}/login`, 302);
 }
 
 export async function verifySession(): Promise<string | SessionResult> {
