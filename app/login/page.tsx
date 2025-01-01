@@ -104,21 +104,21 @@ export default function SignInPage() {
         
         <div className="space-y-4">
           <button
-            onClick={() => signIn("google")}
+            onClick={() => signIn("google", { callbackUrl: '/profile' })}
             className="w-full py-2 px-4 bg-[#4285F4] text-white rounded hover:bg-[#357ABD] transition-colors"
           >
             Sign in with Google
           </button>
 
           <button
-            onClick={() => signIn("github")}
+            onClick={() => signIn("github", { callbackUrl: '/profile' })}
             className="w-full py-2 px-4 bg-[#333] text-white rounded hover:bg-[#222] transition-colors"
           >
             Sign in with Github
           </button>
 
           <button
-            onClick={() => signIn("discord")}
+            onClick={() => signIn("discord", { callbackUrl: '/profile' })}
             className="w-full py-2 px-4 bg-[#7289DA] text-white rounded hover:bg-[#677BC4] transition-colors"
           >
             Sign in with Discord

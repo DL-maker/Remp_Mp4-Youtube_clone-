@@ -25,6 +25,8 @@ const signupAction = async (formData: FormData): Promise<SignupState> => {
         error: result.error
       };
     }
+    // Redirection vers le profil après l'inscription
+    window.location.href = '/profile';
     return {
       success: result.success,
       error: {}

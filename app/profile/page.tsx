@@ -3,6 +3,9 @@ import { useEffect, useState } from 'react';
 
 interface ProfileState {
   userId?: string;
+  username?: string;
+  email?: string;
+  createdAt?: string;
   error?: string;
 }
 
@@ -17,7 +20,12 @@ export default function ProfilePage() {
       if (response.status !== 200) {
         setState({ error: result.error });
       } else {
-        setState({ userId: result.userId });
+        setState({
+          userId: result.userId,
+          username: result.username,
+          email: result.email,
+          createdAt: result.createdAt,
+        });
       }
     };
 
@@ -33,9 +41,15 @@ export default function ProfilePage() {
       <div className="w-full max-w-md space-y-8">
         <h1 className="text-2xl font-bold text-center mb-8">Profile</h1>
         {state.userId ? (
-          <div>
-            <p>Welcome, user {state.userId}!</p>
-            {/* Add more user information here */}
+          <div className="text-center">
+            <img
+              src="https://thispersondoesnotexist.com"
+              alt="Profile Picture"
+              className="w-24 h-24 rounded-full mx-auto mb-4"
+            />
+            <p>Welcome, {state.username}!</p>
+            <p>Email: {state.email}</p>
+            <p>Account created on: {new Date(state.createdAt!).toLocaleDateString()}</p>
           </div>
         ) : (
           <p>Loading...</p>
