@@ -1,14 +1,106 @@
 'use client';
 import { signIn } from "next-auth/react";
 import { SignUpForm } from "./form";
+import { useState } from "react";
+
+// Définition des types
+interface LoginState {
+  error?: string;
+}
+
+const loginAction = async (formData: FormData): Promise<LoginState> => {
+  try {
+    const result = await signIn('credentials', {
+      redirect: false,
+      username: formData.get('username'),
+      password: formData.get('password'),
+    });
+
+    if (result?.error) {
+      return { error: result.error };
+    }
+
+    // Redirection vers le profil après la connexion
+    window.location.href = '/profile';
+    return {};
+  } catch (e) {
+    console.error('Login error:', e);
+    return { error: 'An unexpected error occurred. Please try again.' };
+  }
+};
+
+function LoginForm() {
+  const [state, setState] = useState<LoginState>({});
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const result = await loginAction(formData);
+    setState(result);
+  };
+
+  return (
+    <div className="w-full max-w-md">
+      <form onSubmit={handleSubmit} className="space-y-4">
+        <div>
+          <input
+            name="username"
+            type="text"
+            placeholder="Username"
+            className="w-full p-2 border rounded"
+          />
+        </div>
+
+        <div>
+          <input
+            name="password"
+            type="password"
+            placeholder="Password"
+            className="w-full p-2 border rounded"
+          />
+        </div>
+
+        {state.error && (
+          <span className="text-red-500 text-sm">{state.error}</span>
+        )}
+
+        <button
+          type="submit"
+          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+        >
+          Log In
+        </button>
+      </form>
+    </div>
+  );
+}
 
 export default function SignInPage() {
+  const [isSignUp, setIsSignUp] = useState(true);
+
   return (
     <div className="min-h-screen flex flex-col items-center justify-center p-4">
       <div className="w-full max-w-md space-y-8">
-        <h1 className="text-2xl font-bold text-center mb-8">Sign In</h1>
+        <h1 className="text-2xl font-bold text-center mb-8">
+          {isSignUp ? 'Sign Up' : 'Sign In'}
+        </h1>
         
-        <SignUpForm />
+        <div className="flex justify-center space-x-4 mb-4">
+          <button
+            onClick={() => setIsSignUp(true)}
+            className={`px-4 py-2 rounded ${isSignUp ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+          >
+            Sign Up
+          </button>
+          <button
+            onClick={() => setIsSignUp(false)}
+            className={`px-4 py-2 rounded ${!isSignUp ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+          >
+            Sign In
+          </button>
+        </div>
+
+        {isSignUp ? <SignUpForm /> : <LoginForm />}
         
         <div className="space-y-4">
           <button

@@ -57,7 +57,7 @@ export async function createSession(userId: string): Promise<NextResponse> {
   });
   
   const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
-  return NextResponse.redirect(`${baseUrl}/login`, 302);
+  return NextResponse.redirect(`${baseUrl}/profile`, 302);
 }
 
 export async function verifySession(): Promise<string | SessionResult> {
@@ -78,5 +78,6 @@ export async function verifySession(): Promise<string | SessionResult> {
 
 export async function deleteSession(): Promise<NextResponse> {
   (await cookies()).delete(cookie.name);
-  return NextResponse.redirect('/login', 302);
+  const baseUrl = process.env.BASE_URL || 'http://localhost:3000';
+  return NextResponse.redirect(`${baseUrl}/login`, 302);
 }
