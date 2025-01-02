@@ -1,27 +1,37 @@
 'use client';
-import { useActionState } from "react";
+import { useState } from "react";
 import { useFormStatus } from "react-dom";
 import { signup } from './actions';
 
 // Définition des types
-interface SignupState {
-  error: {
-    username?: string[];
-    email?: string[];
-    password?: string[];
-  };
+
+export interface SignupState {
+  error?: Record<string, string[]>;
   success?: boolean;
+  user?: {
+    id: string;
+    username: string;
+    email: string;
+  };
 }
 
 // Wrapper pour l'action signup
-const signupAction = async (state: SignupState, formData: FormData): Promise<SignupState> => {
+const signupAction = async (formData: FormData): Promise<SignupState> => {
   try {
-    const result = await signup(formData);
+    const result = await signup(formData, window.location.origin);
+    if ('error' in result) {
+      return {
+        success: false,
+        error: result.error
+      };
+    }
+    // Redirection vers le profil après l'inscription
+    window.location.href = '/profile';
     return {
-      error: result.error || {} // Ensure we always return an object for error
+      success: result.success,
+      error: {}
     };
-  } catch (e) { // Renommé error en e pour éviter l'avertissement
-    // On peut aussi utiliser l'erreur si on veut
+  } catch (e) {
     console.error('Signup error:', e);
     return {
       error: {
@@ -47,11 +57,18 @@ function SubmitButton() {
 
 export function SignUpForm() {
   const initialState: SignupState = { error: {} };
-  const [state, action] = useActionState(signupAction, initialState);
+  const [state, setState] = useState(initialState);
+
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+    event.preventDefault();
+    const formData = new FormData(event.currentTarget);
+    const result = await signupAction(formData);
+    setState(result);
+  };
 
   return (
     <div className="w-full max-w-md">
-      <form action={action} className="space-y-4">
+      <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <input
             name="username"
