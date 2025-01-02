@@ -7,11 +7,13 @@ export default function Navbar() {
     <nav className="bg-white shadow-sm">
       <div className="container mx-auto px-4 py-3">
         <div className="flex items-center justify-between mb-4">
+          <Link href="/" prefetch={false}>
           <img
             src="/Logo_light_mode.png"
             alt="Logo"
             className="h-10 w-auto"
           />
+          </Link>
           
           <div className="flex items-center space-x-4">
             <input
