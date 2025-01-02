@@ -16,16 +16,15 @@ const loginAction = async (formData: FormData): Promise<LoginState> => {
       password: formData.get('password'),
     });
 
-    if (result?.error) {
-      return { error: result.error };
+    if (!result?.error) {
+      window.location.href = '/profile';
+      return {};
     }
 
-    // Redirection vers le profil après la connexion
-    window.location.href = '/profile';
-    return {};
+    return { error: result.error };
   } catch (e) {
     console.error('Login error:', e);
-    return { error: 'An unexpected error occurred. Please try again.' };
+    return { error: 'An unexpected error occurred' };
   }
 };
 
