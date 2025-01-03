@@ -1,7 +1,7 @@
 'use client';
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
-
+import Navbar from '@/components/navbar';
 interface ProfileState {
   userId?: string;
   username?: string;
@@ -16,7 +16,8 @@ interface ProfileState {
 }
 
 export default function ProfilePage() {
-  const router = useRouter();
+  <Navbar toggleColumn={() => {}} />
+  const router = useRouter();   
   const [state, setState] = useState<ProfileState>({});
   const [isEditing, setIsEditing] = useState(false);
 

@@ -68,9 +68,10 @@ const ColumnOfVideo = () => {
       {videos.map((video) => (
         <div key={video.key} className="px-2 cursor-pointer" onClick={() => router.push(`/video_page?videoId=${video.key}`)}>
           <video width="100%" className="rounded-lg max-w-xs">
-          <source src={video.src} type="video/mp4" />
-          Votre navigateur ne supporte pas la lecture des vidéos.
-        </video><p>{video.title}</p>
+            <source src={video.src} type="video/mp4" />
+            Votre navigateur ne supporte pas la lecture des vidéos.
+          </video>
+          <p>{video.title}</p>
         </div>
       ))}
       <div ref={observerTarget} className="h-10" />
