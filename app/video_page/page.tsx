@@ -13,8 +13,8 @@ async function fetchVideoList() {
     }
     const videoFiles = await response.json();
     return videoFiles.map((name: string) => ({
-      src: `/videos/${name}.mp4`,
-      title: name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+      src: `/videos/${name}`, // Chemin relatif vers la vidéo 
+      title: name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()), // Remplace les _ par des espaces et met en majuscule la première lettre de chaque mot
       key: name // Utilisation du nom du fichier comme clé unique
     }));
   } catch (error) {
@@ -29,7 +29,7 @@ const VideoPage = () => {
   const videoId = searchParams.get('videoId');
 
   const [videos, setVideos] = useState<Array<{ src: string; title: string; key: string }>>([]);
-  const [selectedVideo, setSelectedVideo] = useState<{ src: string; title: string } | null>(null);
+  const [selectedVideo, setSelectedVideo] = useState<{ src: string; title: string; key: string } | null>(null);
 
   useEffect(() => {
     const loadVideos = async () => {
@@ -45,9 +45,13 @@ const VideoPage = () => {
     loadVideos();
   }, [videoId]);
 
+  function toggleColumn(): void {
+    throw new Error("Function not implemented.");
+  }
+
   return (
     <div>
-      <Navbar toggleColumn={() => {}} />
+      <Navbar toggleColumn={toggleColumn} />
       <div className="flex">
         <div className="flex-1 p-4">
           {selectedVideo ? (

@@ -1,19 +1,17 @@
-import fs from "fs";
-import path from "path";
-import { NextResponse } from "next/server";
+import { NextResponse } from 'next/server';
+import path from 'path';
+import { promises as fs } from 'fs';
 
 export async function GET() {
   try {
-    const videoDir = path.join(process.cwd(), "videos"); // Chemin vers le dossier des vidéos
-    const files = fs.readdirSync(videoDir); // Lire les fichiers dans le dossier
-
-    // Filtrer uniquement les fichiers .mp4
-    const videoFiles = files.filter((file) => file.endsWith(".mp4"));
-
-    // Retourner les noms des fichiers vidéo dans la réponse
+    const videosDirectory = path.join(process.cwd(), 'public', 'videos');
+    const files = await fs.readdir(videosDirectory);
+    const videoFiles = files.filter(file => 
+      file.endsWith('.mp4') || file.endsWith('.webm')
+    );
     return NextResponse.json(videoFiles);
   } catch (error) {
-    console.error("Erreur lors de la lecture des vidéos:", error);
-    return NextResponse.json({ error: "Impossible de lire les vidéos" }, { status: 500 });
+    console.error('Erreur lors de la lecture du dossier videos:', error);
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

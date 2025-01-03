@@ -12,7 +12,7 @@ async function fetchVideoList() {
     }
     const videoFiles = await response.json();
     return videoFiles.map((name: string) => ({
-      src: `/videos/${name}.mp4`,
+      src: `/videos/${name}`,
       title: name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
       key: name // Utilisation du nom du fichier comme clé unique
     }));
@@ -67,11 +67,10 @@ const ColumnOfVideo = () => {
     <div className="grid grid-cols-3 gap-4 p-4">
       {videos.map((video) => (
         <div key={video.key} className="px-2 cursor-pointer" onClick={() => router.push(`/video_page?videoId=${video.key}`)}>
-          <video width="100%" controls className="rounded-lg max-w-xs">
-            <source src={video.src} type="video/mp4" />
-            Votre navigateur ne supporte pas la lecture des vidéos.
-          </video>
-          <p>{video.title}</p>
+          <video width="100%" className="rounded-lg max-w-xs">
+          <source src={video.src} type="video/mp4" />
+          Votre navigateur ne supporte pas la lecture des vidéos.
+        </video><p>{video.title}</p>
         </div>
       ))}
       <div ref={observerTarget} className="h-10" />
