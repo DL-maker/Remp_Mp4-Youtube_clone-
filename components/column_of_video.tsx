@@ -1,19 +1,20 @@
 "use client";
 
 import React, { useState, useEffect, useRef } from "react";
+import { useRouter } from "next/navigation";
 
 // Fonction pour récupérer la liste des vidéos depuis l'API
 async function fetchVideoList() {
   try {
-    const response = await fetch("/api/list-videos/"); // Utilisez le chemin correct de l'API
+    const response = await fetch("/api/list-videos");
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
     const videoFiles = await response.json();
-    return videoFiles.map((name: string, index: number) => ({
-      id: index,
-      src: `/videos/${name}`,
+    return videoFiles.map((name: string) => ({
+      src: `/videos/${name}.mp4`,
       title: name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+      key: name // Utilisation du nom du fichier comme clé unique
     }));
   } catch (error) {
     console.error("Erreur lors de la récupération de la liste des vidéos:", error);
@@ -22,9 +23,10 @@ async function fetchVideoList() {
 }
 
 const ColumnOfVideo = () => {
-  const [videos, setVideos] = useState<Array<{ id: number; src: string; title: string }>>([]);
+  const [videos, setVideos] = useState<Array<{ src: string; title: string; key: string }>>([]);
   const [loading, setLoading] = useState(false);
   const observerTarget = useRef<HTMLDivElement | null>(null);
+  const router = useRouter();
 
   useEffect(() => {
     const loadInitialVideos = async () => {
@@ -40,8 +42,6 @@ const ColumnOfVideo = () => {
   useEffect(() => {
     const loadMoreVideos = async () => {
       setLoading(true);
-
-      // Si vous souhaitez charger des vidéos supplémentaires dynamiquement, vous pouvez modifier ici
       const moreVideos = await fetchVideoList();
       setVideos((prev) => [...prev, ...moreVideos]);
       setLoading(false);
@@ -66,7 +66,7 @@ const ColumnOfVideo = () => {
   return (
     <div className="grid grid-cols-3 gap-4 p-4">
       {videos.map((video) => (
-        <div key={video.id} className="px-2">
+        <div key={video.key} className="px-2 cursor-pointer" onClick={() => router.push(`/video_page?videoId=${video.key}`)}>
           <video width="100%" controls className="rounded-lg max-w-xs">
             <source src={video.src} type="video/mp4" />
             Votre navigateur ne supporte pas la lecture des vidéos.
