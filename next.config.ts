@@ -1,19 +1,32 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  /* config options here */
-  images: { 
+  images: {
     remotePatterns: [
       {
         protocol: "https",
-        hostname: "thispersondoesnotexist.com",// this is a fake person generator
+        hostname: "thispersondoesnotexist.com",
       },
       {
         protocol: "http",
-        hostname: "test.com", // ...
+        hostname: "test.com",
       }
     ],
-  }
+  },
+  webpack: (config) => {
+    config.module.rules.push({
+      test: /\.(mp4|webm)$/,
+      use: {
+        loader: 'file-loader',
+        options: {
+          publicPath: '/_next/static/videos/',
+          outputPath: 'static/videos/',
+          name: '[name].[hash].[ext]',
+        },
+      },
+    });
+    return config;
+  },
 };
 
 export default nextConfig;
