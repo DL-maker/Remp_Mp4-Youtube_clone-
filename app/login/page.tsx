@@ -2,6 +2,7 @@
 import { signIn } from "next-auth/react";
 import { SignUpForm } from "./form";
 import { useState } from "react";
+import Navbar from "@/components/navbar";
 
 // Définition des types
 interface LoginState {
@@ -46,6 +47,7 @@ function LoginForm() {
             name="username"
             type="text"
             placeholder="Username"
+            required
             className="w-full p-2 border rounded"
           />
         </div>
@@ -55,6 +57,7 @@ function LoginForm() {
             name="password"
             type="password"
             placeholder="Password"
+            required
             className="w-full p-2 border rounded"
           />
         </div>
@@ -65,7 +68,7 @@ function LoginForm() {
 
         <button
           type="submit"
-          className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
         >
           Log In
         </button>
@@ -78,52 +81,57 @@ export default function SignInPage() {
   const [isSignUp, setIsSignUp] = useState(true);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center p-4">
-      <div className="w-full max-w-md space-y-8">
-        <h1 className="text-2xl font-bold text-center mb-8">
-          {isSignUp ? 'Sign Up' : 'Sign In'}
-        </h1>
-        
-        <div className="flex justify-center space-x-4 mb-4">
-          <button
-            onClick={() => setIsSignUp(true)}
-            className={`px-4 py-2 rounded ${isSignUp ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-          >
-            Sign Up
-          </button>
-          <button
-            onClick={() => setIsSignUp(false)}
-            className={`px-4 py-2 rounded ${!isSignUp ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
-          >
-            Sign In
-          </button>
-        </div>
+    <>
+      <Navbar toggleColumn={function (): void {
+        throw new Error("Function not implemented.");
+      } } />
+      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+        <div className="w-full max-w-md space-y-8">
+          <h1 className="text-2xl font-bold text-center mb-8">
+            {isSignUp ? 'Sign Up' : 'Sign In'}
+          </h1>
+          
+          <div className="flex justify-center space-x-4 mb-4">
+            <button
+              onClick={() => setIsSignUp(true)}
+              className={`px-4 py-2 rounded ${isSignUp ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            >
+              Sign Up
+            </button>
+            <button
+              onClick={() => setIsSignUp(false)}
+              className={`px-4 py-2 rounded ${!isSignUp ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+            >
+              Sign In
+            </button>
+          </div>
 
-        {isSignUp ? <SignUpForm /> : <LoginForm />}
-        
-        <div className="space-y-4">
-          <button
-            onClick={() => signIn("google", { callbackUrl: '/profile' })}
-            className="w-full py-2 px-4 bg-[#4285F4] text-white rounded hover:bg-[#357ABD] transition-colors"
-          >
-            Sign in with Google
-          </button>
+          {isSignUp ? <SignUpForm /> : <LoginForm />}
+          
+          <div className="space-y-4">
+            <button
+              onClick={() => signIn("google", { callbackUrl: '/profile' })}
+              className="w-full py-2 px-4 bg-[#4285F4] text-white rounded hover:bg-[#357ABD] transition-colors"
+            >
+              Sign in with Google
+            </button>
 
-          <button
-            onClick={() => signIn("github", { callbackUrl: '/profile' })}
-            className="w-full py-2 px-4 bg-[#333] text-white rounded hover:bg-[#222] transition-colors"
-          >
-            Sign in with Github
-          </button>
+            <button
+              onClick={() => signIn("github", { callbackUrl: '/profile' })}
+              className="w-full py-2 px-4 bg-[#333] text-white rounded hover:bg-[#222] transition-colors"
+            >
+              Sign in with Github
+            </button>
 
-          <button
-            onClick={() => signIn("discord", { callbackUrl: '/profile' })}
-            className="w-full py-2 px-4 bg-[#7289DA] text-white rounded hover:bg-[#677BC4] transition-colors"
-          >
-            Sign in with Discord
-          </button>
+            <button
+              onClick={() => signIn("discord", { callbackUrl: '/profile' })}
+              className="w-full py-2 px-4 bg-[#7289DA] text-white rounded hover:bg-[#677BC4] transition-colors"
+            >
+              Sign in with Discord
+            </button>
+          </div>
         </div>
       </div>
-    </div>
+    </>
   );
 }

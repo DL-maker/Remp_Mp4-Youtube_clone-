@@ -21,12 +21,13 @@ const Navbar: React.FC<NavbarProps> = ({ toggleColumn }) => {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16m-7 6h7" />
               </svg>
             </button>
+            <Link href="/">
             <img
               src="/Logo_light_mode.png"
               alt="Logo"
               className="h-10 w-auto cursor-pointer"
-              onClick={() => window.location.reload()}
             />
+            </Link>
           </div>
           
           <div className="flex items-center space-x-4">
