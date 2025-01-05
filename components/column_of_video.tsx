@@ -3,10 +3,12 @@
 import React, { useState, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 
+const VIDEO_LOAD_LIMIT = 10; // Limite du nombre de vidéos chargées à chaque fois
+
 // Fonction pour récupérer la liste des vidéos depuis l'API
-async function fetchVideoList() {
+async function fetchVideoList(startIndex: number, limit: number) {
   try {
-    const response = await fetch("/api/list-videos");
+    const response = await fetch(`/api/list-videos?start=${startIndex}&limit=${limit}`);
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
@@ -25,15 +27,19 @@ async function fetchVideoList() {
 const ColumnOfVideo = () => {
   const [videos, setVideos] = useState<Array<{ src: string; title: string; key: string }>>([]);
   const [loading, setLoading] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const observerTarget = useRef<HTMLDivElement | null>(null);
   const router = useRouter();
 
   useEffect(() => {
     const loadInitialVideos = async () => {
       setLoading(true);
-      const initialVideos = await fetchVideoList();
+      const initialVideos = await fetchVideoList(0, VIDEO_LOAD_LIMIT);
       setVideos(initialVideos);
       setLoading(false);
+      if (initialVideos.length < VIDEO_LOAD_LIMIT) {
+        setHasMore(false);
+      }
     };
 
     loadInitialVideos();
@@ -42,14 +48,17 @@ const ColumnOfVideo = () => {
   useEffect(() => {
     const loadMoreVideos = async () => {
       setLoading(true);
-      const moreVideos = await fetchVideoList();
+      const moreVideos = await fetchVideoList(videos.length, VIDEO_LOAD_LIMIT);
       setVideos((prev) => [...prev, ...moreVideos]);
       setLoading(false);
+      if (moreVideos.length < VIDEO_LOAD_LIMIT) {
+        setHasMore(false);
+      }
     };
 
     const observer = new IntersectionObserver(
       (entries) => {
-        if (entries[0].isIntersecting && !loading) {
+        if (entries[0].isIntersecting && !loading && hasMore) {
           loadMoreVideos();
         }
       },
@@ -61,7 +70,7 @@ const ColumnOfVideo = () => {
     }
 
     return () => observer.disconnect();
-  }, [loading]);
+  }, [loading, hasMore, videos.length]);
 
   return (
     <div className="grid grid-cols-3 gap-4 p-4">
@@ -78,6 +87,11 @@ const ColumnOfVideo = () => {
       {loading && (
         <div className="col-span-full text-center py-4">
           Chargement des vidéos...
+        </div>
+      )}
+      {!hasMore && (
+        <div className="col-span-full text-center py-4">
+          Toutes les vidéos ont été chargées.
         </div>
       )}
     </div>
