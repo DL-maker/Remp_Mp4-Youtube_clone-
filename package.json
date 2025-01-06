@@ -31,6 +31,7 @@
     "dev": "next dev"
   },
   "devDependencies": {
+    "@types/jsonwebtoken": "^9.0.7",
     "@types/next-auth": "^3.13.0",
     "@types/node": "^22.10.5",
     "@types/react": "^19.0.2",
