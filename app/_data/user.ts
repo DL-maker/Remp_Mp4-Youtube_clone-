@@ -44,7 +44,7 @@ interface User {
 
 // Define session type
 interface SessionData {
-  userId: number;
+  userId: string;
 }
 
 export const getUser = cache(async (): Promise<User> => {
@@ -54,9 +54,9 @@ export const getUser = cache(async (): Promise<User> => {
     throw new Error('Session not found');
   }
   
-  const { userId } = session as unknown as SessionData;
+  const { userId } = session as SessionData;
 
-  const userIdNumber = parseInt(userId.toString(), 10);
+  const userIdNumber = parseInt(userId, 10);
   if (isNaN(userIdNumber)) {
     throw new Error('Invalid user ID');
   }
@@ -77,7 +77,6 @@ export const getUser = cache(async (): Promise<User> => {
     }
   });
 
-  // Combine likes and dislikes if needed
   if (!user) {
     throw new Error('User not found');
   }
@@ -87,9 +86,6 @@ export const getUser = cache(async (): Promise<User> => {
     ...user,
     likesDislikes: user.likes
   };
-  if (!user) {
-    throw new Error('User not found');
-  }
 
   return userData as unknown as User;
 });
