@@ -3,27 +3,11 @@
   "version": "0.1.0",
   "private": true,
   "dependencies": {
-    "autoprefixer": "^10.4.20",
-    "jose": "^5.9.6",
-    "next": "^13.0.0",
-    "next-auth": "^4.24.11",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
-    "tailwindcss": "^3.4.17",
-    "zod": "^3.24.1",
-    "oidc-token-hash": "^5.0.3"
-  },
-  "scripts": {
-    "start": "next start",
-    "build": "next build",
-    "test": "jest",
-    "dev": "next dev"
-  },
-  "dependencies": {
     "@mux/mux-node": "^9.0.1",
     "@mux/mux-player-react": "^3.2.4",
     "@prisma/client": "^6.0.1",
     "@types/bcrypt": "^5.0.2",
+    "autoprefixer": "^10.4.20",
     "bcrypt": "^5.1.1",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
@@ -39,7 +23,12 @@
     "tailwind-merge": "^2.6.0",
     "tailwindcss-animate": "^1.0.7",
     "zod": "^3.24.1"
-
+  },
+  "scripts": {
+    "start": "next start",
+    "build": "next build",
+    "test": "jest",
+    "dev": "next dev"
   },
   "devDependencies": {
     "@types/next-auth": "^3.13.0",
