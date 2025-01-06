@@ -56,24 +56,20 @@ export const getUser = cache(async (): Promise<User> => {
   
   const { userId } = session as SessionData;
 
-  const userIdNumber = parseInt(userId, 10);
-  if (isNaN(userIdNumber)) {
-    throw new Error('Invalid user ID');
-  }
-
   // Fetch user data with all relations defined in schema
   const user = await prisma.user.findUnique({
     where: {
-      id: userIdNumber
+      id: userId
     },
     select: {
       id: true,
       username: true,
       email: true,
       videos: true,
-      likes: true,
+      likesDislikes: true,
       comments: true,
-      subscriptions: true,
+      subscriptionsFrom: true,
+      subscriptionsTo: true
     }
   });
 
@@ -81,11 +77,5 @@ export const getUser = cache(async (): Promise<User> => {
     throw new Error('User not found');
   }
 
-  // Combine likes and dislikes if needed
-  const userData = {
-    ...user,
-    likesDislikes: user.likes
-  };
-
-  return userData as unknown as User;
+  return user as unknown as User;
 });
