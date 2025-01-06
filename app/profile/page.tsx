@@ -2,6 +2,8 @@
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/navbar';
+import Image from 'next/image';
+
 interface ProfileState {
   userId?: string;
   username?: string;
@@ -61,9 +63,11 @@ export default function ProfilePage() {
             <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
               <div className="flex items-center gap-6">
                 <div className="w-32 h-32 bg-gray-200 rounded-full overflow-hidden">
-                  <img
+                  <Image
                     src="https://thispersondoesnotexist.com"
                     alt="Profile"
+                    width={128}
+                    height={128}
                     className="w-full h-full object-cover"
                   />
                 </div>

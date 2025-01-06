@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Navbar from "@/components/navbar";
 
@@ -23,10 +23,10 @@ async function fetchVideoList() {
   }
 }
 
-const VideoPage = () => {
+function VideoPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const videoId = searchParams.get('videoId');
+  const videoId = searchParams ? searchParams.get('videoId') : null;
 
   const [videos, setVideos] = useState<Array<{ src: string; title: string; key: string }>>([]);
   const [selectedVideo, setSelectedVideo] = useState<{ src: string; title: string; key: string } | null>(null);
@@ -83,6 +83,12 @@ const VideoPage = () => {
       </div>
     </div>
   );
-};
+}
 
-export default VideoPage;
+export default function VideoPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <VideoPageContent />
+    </Suspense>
+  );
+}

@@ -1,62 +1,15 @@
-import NextAuth from 'next-auth';
-import CredentialsProvider from 'next-auth/providers/credentials';
-import { prisma } from '@/lib/prisma';
-import bcrypt from 'bcrypt';
+// app/api/auth/route.ts
+import { NextResponse } from 'next/server';
 
-// ...existing code...
+export const runtime = 'nodejs';
 
-export default NextAuth({
-  providers: [
-    CredentialsProvider({
-      name: 'Credentials',
-      credentials: {
-        username: { label: 'Username', type: 'text' },
-        password: { label: 'Password', type: 'password' },
-      },
-      async authorize(credentials) {
-        if (!credentials?.username) {
-          return null;
-        }
+export async function GET() {
+  return NextResponse.json({ status: 'Authentication temporarily disabled' });
+}
 
-        const user = await prisma.user.findUnique({
-          where: { username: credentials.username as string },
-        });
+export async function POST() {
+  return NextResponse.json({ status: 'Authentication temporarily disabled' });
+}
 
-        if (
-          user &&
-          credentials.password &&
-          user.passwordHash &&
-          bcrypt.compareSync(credentials.password as string, user.passwordHash as string)
-        ) {
-          return {
-            id: user.id.toString(),
-            name: user.username,
-            email: user.email,
-          };
-        }
-
-        return null;
-      },
-    }),
-    // ...other existing providers...
-  ],
-  pages: {
-    signIn: '/login',
-  },
-  callbacks: {
-    async session({ session, token }) {
-      return {
-        ...session,
-        user: {
-          ...session.user,
-          id: token.id as string,
-        },
-      };
-    },
-    async redirect({ baseUrl }) {
-      return baseUrl;
-    },
-  },
-  secret: process.env.NEXTAUTH_SECRET,
-  // ...existing code...
-});
+// Note: Ne pas utiliser export default dans les route handlers de Next.js
+// Remove any default export

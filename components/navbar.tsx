@@ -2,6 +2,7 @@
 
 import React from 'react';
 import Link from 'next/link';
+import Image from 'next/image';
 
 interface NavbarProps {
   toggleColumn: () => void;
@@ -22,11 +23,13 @@ const Navbar: React.FC<NavbarProps> = ({ toggleColumn }) => {
               </svg>
             </button>
             <Link href="/">
-            <img
-              src="/Logo_light_mode.png"
-              alt="Logo"
-              className="h-10 w-auto cursor-pointer"
-            />
+              <Image
+                src="/Logo_light_mode.png"
+                alt="Logo"
+                width={40}
+                height={40}
+                className="h-10 w-auto cursor-pointer"
+              />
             </Link>
           </div>
           
@@ -38,9 +41,11 @@ const Navbar: React.FC<NavbarProps> = ({ toggleColumn }) => {
             />
             
             <Link href="/profile" prefetch={false}>
-              <img
+              <Image
                 src={"https://thispersondoesnotexist.com"}
                 alt="Profile"
+                width={40}
+                height={40}
                 className="rounded-full h-10 w-10 object-cover cursor-pointer"
               />
             </Link>

@@ -1,8 +1,6 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
-import Navbar from "@/components/navbar";
-//import { Providers } from "@/lib/utils"; // Ensure this path is correct and the module exists And the tag Which was inserted between line 28-29 and 34-35 is removed
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
