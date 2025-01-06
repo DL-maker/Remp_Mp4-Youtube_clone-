@@ -18,6 +18,7 @@ const options = {
       clientId: process.env.DISCORD_CLIENT_ID || "",
       clientSecret: process.env.DISCORD_CLIENT_SECRET || "",
     }),
+    // ...other providers if any...
   ],
   secret: process.env.NEXTAUTH_SECRET,
 };
@@ -27,7 +28,6 @@ if (!options.providers || options.providers.length === 0) {
 }
 
 const auth = NextAuth(options);
-
 export { auth, signIn };
 
 export async function getServerSideProps(context: GetSessionParams | undefined) {
