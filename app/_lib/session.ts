@@ -15,7 +15,7 @@ interface SessionResult {
 }
 
 // Constants
-const key = new TextEncoder().encode(process.env.SECRET_KEY);
+const key = new TextEncoder().encode(process.env.SECRET_KEY || "default_secret_key");
 
 const cookie = {
   name: 'session',

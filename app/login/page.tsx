@@ -79,12 +79,15 @@ function LoginForm() {
 
 export default function SignInPage() {
   const [isSignUp, setIsSignUp] = useState(true);
+  const [isColumnOpen, setIsColumnOpen] = useState(false);
+
+  const toggleColumn = () => {
+    setIsColumnOpen((prev) => !prev);
+  };
 
   return (
     <>
-      <Navbar toggleColumn={function (): void {
-        throw new Error("Function not implemented.");
-      } } />
+      <Navbar toggleColumn={toggleColumn} />
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
         <div className="w-full max-w-md space-y-8">
           <h1 className="text-2xl font-bold text-center mb-8">
@@ -130,6 +133,21 @@ export default function SignInPage() {
               Sign in with Discord
             </button>
           </div>
+
+          {/* Add a button to toggle the column */}
+          <button
+            onClick={toggleColumn}
+            className="w-full py-2 px-4 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors mt-4"
+          >
+            Toggle Column
+          </button>
+
+          {/* Use isColumnOpen to conditionally render content */}
+          {isColumnOpen && (
+            <div className="mt-4 p-4 bg-gray-200 rounded">
+              <p>Column is open!</p>
+            </div>
+          )}
         </div>
       </div>
     </>
