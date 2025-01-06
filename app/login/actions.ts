@@ -59,12 +59,8 @@ export async function signup(formData: FormData, baseUrl: string): Promise<Signu
 
     // Création de l'utilisateur dans la base de données
     const user = await prisma.user.create({
-      data: { 
-        username, 
-        email, 
-        passwordHash: hashedPassword,
-        role: 'USER' // Add the role property
-      },
+
+      data: { username, email, passwordHash: hashedPassword, role: 'USER' },
       select: { id: true, username: true, email: true },
     });
 

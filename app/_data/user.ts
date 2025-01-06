@@ -68,9 +68,10 @@ export const getUser = cache(async (): Promise<User> => {
       videos: true,
       likes: true,
       comments: true,
+
       subscriptions: true,
-      subscribers: true,
-    },
+      subscribers: true
+    }
   });
 
   if (!user) {

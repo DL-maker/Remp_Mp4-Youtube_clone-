@@ -22,8 +22,9 @@ async function fetchVideoList() {
   }
 }
 
-const VideoPage = () => {
+function VideoPageContent() {
   const router = useRouter();
+
   const [videos, setVideos] = useState<Array<{ src: string; title: string; key: string }>>([]);
   const [selectedVideo, setSelectedVideo] = useState<{ src: string; title: string; key: string } | null>(null);
   const [username, setUsername] = useState<string>("");
@@ -147,6 +148,12 @@ const VideoPage = () => {
       </div>
     </Suspense>
   );
-};
+}
 
-export default VideoPage;
+export default function VideoPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <VideoPageContent />
+    </Suspense>
+  );
+}

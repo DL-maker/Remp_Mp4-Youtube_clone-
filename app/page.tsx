@@ -6,7 +6,6 @@ import ColumnOfVideo from "@/components/column_of_video";
 import Navbar from "@/components/navbar";
 import { useRouter } from 'next/navigation';
 
-// On définit les composants AVANT le composant de page
 
 interface CollapsibleColumnProps {
   isOpen: boolean;
@@ -137,7 +136,7 @@ const CollapsibleColumn: React.FC<CollapsibleColumnProps> = ({ isOpen, toggleCol
               <p className="cursor-pointer hover:underline">Conditions d&apos;utilisation</p>
               <p className="cursor-pointer hover:underline">Confidentialité</p>
               <p className="cursor-pointer hover:underline">Règles et sécurité</p>
-              <p className="mt-4">© 2025 LD-Makeur</p>
+              <p className="mt-4">&copy; 2025 LD-Makeur</p>
             </div>
           </div>
         </>

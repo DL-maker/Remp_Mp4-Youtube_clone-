@@ -1,31 +1,45 @@
-// Remove unused import
-// import { auth } from "@/auth";
 import NextAuth from "next-auth";
+import CredentialsProvider from "next-auth/providers/credentials";
+import type { AuthOptions } from "next-auth";
+import type { NextRequest } from "next/server";
 
-// Remove unused parameter
-export async function GET() {
-  const authResponse = await NextAuth({
-    providers: [
-      // Add your providers here
-    ],
-    secret: process.env.NEXTAUTH_SECRET,
-    // Add other NextAuth configuration options here
-  });
-  return new Response(JSON.stringify(authResponse), {
-    headers: { "Content-Type": "application/json" },
-  });
+const authOptions: AuthOptions = {
+  providers: [
+    CredentialsProvider({
+      name: "Credentials",
+      credentials: {
+        username: { label: "Username", type: "text" },
+        password: { label: "Password", type: "password" }
+      },
+      async authorize(credentials) {
+        const user = {
+          id: 1,  // Assuming this is a number from your database
+          username: "test",
+          email: "test@example.com"
+        };
+
+        if (credentials?.username === "test" && credentials?.password === "test") {
+          return {
+            id: user.id.toString(),  // Convert id to string
+            name: user.username,
+            email: user.email
+          };
+        }
+        return null;
+      }
+    })
+  ],
+  pages: {
+    signIn: "/auth/signin",
+  }
+};
+
+const handler = NextAuth(authOptions);
+
+export async function GET(request: NextRequest) {
+  return handler(request);
 }
 
-// Remove unused parameter
-export async function POST() {
-  const authResponse = await NextAuth({
-    providers: [
-      // Add your providers here
-    ],
-    secret: process.env.NEXTAUTH_SECRET,
-    // Add other NextAuth configuration options here
-  });
-  return new Response(JSON.stringify(authResponse), {
-    headers: { "Content-Type": "application/json" },
-  });
+export async function POST(request: NextRequest) {
+  return handler(request);
 }
