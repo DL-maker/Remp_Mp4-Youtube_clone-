@@ -5,6 +5,7 @@ import Image from 'next/image';
 import ColumnOfVideo from "@/components/column_of_video";
 import Navbar from "@/components/navbar";
 import { useRouter } from 'next/navigation';
+import Link from 'next/link';
 
 
 interface CollapsibleColumnProps {
@@ -130,7 +131,7 @@ const CollapsibleColumn: React.FC<CollapsibleColumnProps> = ({ isOpen, toggleCol
             <br />
             <hr className="my-2 border-black" />
             <div className="px-4 py-2 text-gray-700">
-              <p className="cursor-pointer hover:underline">Presse Droits d&apos;auteur</p>
+                <p className="cursor-pointer hover:underline" onClick={() => router.push('/presse_droits')}>Presse Droits d&apos;auteur</p>
               <p className="cursor-pointer hover:underline">Nous contacter</p>
               <p className="cursor-pointer hover:underline">Publicité</p>
               <p className="cursor-pointer hover:underline">Conditions d&apos;utilisation</p>
