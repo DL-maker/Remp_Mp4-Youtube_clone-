@@ -69,8 +69,8 @@ export const getUser = cache(async (): Promise<User> => {
       likes: true,
       comments: true,
 
-      subscriptionsFrom: true,
-      subscriptionsTo: true
+      subscriptions: true,
+      subscribers: true
     }
   });
 
