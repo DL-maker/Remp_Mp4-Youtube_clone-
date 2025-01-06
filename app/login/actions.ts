@@ -87,7 +87,7 @@ export async function signup(formData: FormData, baseUrl: string): Promise<Signu
     };
 
   } catch (error) {
-    console.error('Signup error:', error);
+    console.error('Signup error:', error instanceof Error ? { message: error.message } : error || {});
     return {
       success: false,
       error: { username: ['An unexpected error occurred. Please try again.'] },

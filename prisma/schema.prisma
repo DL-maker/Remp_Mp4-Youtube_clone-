@@ -1,72 +1,116 @@
-// This is your Prisma schema file
 generator client {
   provider = "prisma-client-js"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL")
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
 }
 
 model User {
-  id          String       @id @default(cuid())
-  username    String       @unique
-  email       String       @unique
-  passwordHash String
-  role        Role        @default(USER)           // Nouveau champ
-  createdAt   DateTime     @default(now())
-  videos      Video[]
-  likesDislikes LikeDislike[]
-  comments    Comment[]
-  subscriptionsFrom Subscription[] @relation("subscriptionsFrom")
-  subscriptionsTo   Subscription[] @relation("subscriptionsTo")
+  id            Int            @id @default(autoincrement())
+  username      String         @unique
+  email         String         @unique
+  passwordHash  String
+  role          Role         
+  sessionNumber String?
+  createdAt     DateTime       @default(now())
+  
+  // Relations
+  videos        Video[]
+  comments      Comment[]
+  likes         LikeDislike[]
+  subscriptions Subscription[]
+  subscribers   Subscription[] @relation("subscribers")
 }
 
-// Nouveau type enum pour les rôles
+model Video {
+  id          String          @id @default(uuid())
+  title       String
+  description String?
+  url         String
+  thumbnail   String?
+  duration    Int
+  views       Int            @default(0)
+  visibility  VideoVisibility @default(PUBLIC)
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+
+  // Relations
+  userId      Int
+  user        User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  comments    Comment[]
+  likes       LikeDislike[]
+}
+
+// Define other models here
+
+model Comment {
+  id        String    @id @default(uuid())
+  content   String
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relations
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  videoId   String
+  video     Video     @relation(fields: [videoId], references: [id], onDelete: Cascade)
+  
+  // Optional: Parent comment for replies
+  parentId  String?
+  parent    Comment?  @relation("CommentReplies", fields: [parentId], references: [id], onDelete: Cascade)
+  replies   Comment[] @relation("CommentReplies")
+
+  @@index([userId])
+  @@index([videoId])
+  @@index([parentId])
+}
+
+model LikeDislike {
+  id        String    @id @default(uuid())
+  type      LikeType
+  createdAt DateTime  @default(now())
+  updatedAt DateTime  @updatedAt
+
+  // Relations
+  userId    Int
+  user      User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  videoId   String
+  video     Video     @relation(fields: [videoId], references: [id], onDelete: Cascade)
+
+  @@unique([userId, videoId])
+  @@index([userId])
+  @@index([videoId])
+}
+
+model Subscription {
+  id        String    @id @default(uuid())
+  createdAt DateTime  @default(now())
+
+  // Relations
+  subscriberId    Int
+  subscriber      User    @relation(fields: [subscriberId], references: [id], onDelete: Cascade)
+  channelId       Int
+  channel         User    @relation("subscribers", fields: [channelId], references: [id], onDelete: Cascade)
+
+  @@unique([subscriberId, channelId])
+  @@index([subscriberId])
+  @@index([channelId])
+}
+
 enum Role {
   USER
   ADMIN
 }
 
-model Video {
-  id           String       @id @default(cuid())
-  title        String
-  description  String?
-  url          String       @unique
-  thumbnailUrl String?
-  publishedAt  DateTime     @default(now())
-  userId       String
-  user         User         @relation(fields: [userId], references: [id])
-  likesDislikes LikeDislike[]
-  comments     Comment[]
+enum VideoVisibility {
+  PUBLIC
+  UNLISTED
+  PRIVATE
 }
 
-model LikeDislike {
-  id        String      @id @default(cuid())
-  isLike    Boolean
-  createdAt DateTime    @default(now())
-  userId    String
-  videoId   String
-  user      User        @relation(fields: [userId], references: [id])
-  video     Video       @relation(fields: [videoId], references: [id])
-}
-
-model Comment {
-  id        String      @id @default(cuid())
-  content   String
-  createdAt DateTime    @default(now())
-  userId    String
-  videoId   String
-  user      User        @relation(fields: [userId], references: [id])
-  video     Video       @relation(fields: [videoId], references: [id])
-}
-
-model Subscription {
-  id              String      @id @default(cuid())
-  subscriberId    String
-  subscribedToId  String
-  createdAt       DateTime    @default(now())
-  subscriber      User        @relation("subscriptionsFrom", fields: [subscriberId], references: [id])
-  subscribedTo    User        @relation("subscriptionsTo", fields: [subscribedToId], references: [id])
+enum LikeType {
+  LIKE
+  DISLIKE
 }

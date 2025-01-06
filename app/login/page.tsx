@@ -79,12 +79,15 @@ function LoginForm() {
 
 export default function SignInPage() {
   const [isSignUp, setIsSignUp] = useState(true);
+  const [isColumnOpen, setIsColumnOpen] = useState(false);
+
+  const toggleColumn = () => {
+    setIsColumnOpen((prev) => !prev);
+  };
 
   return (
     <>
-      <Navbar toggleColumn={function (): void {
-        throw new Error("Function not implemented.");
-      } } />
+      <Navbar toggleColumn={toggleColumn} />
       <div className="min-h-screen flex flex-col items-center justify-center p-4">
         <div className="w-full max-w-md space-y-8">
           <h1 className="text-2xl font-bold text-center mb-8">
