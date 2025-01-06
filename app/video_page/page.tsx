@@ -25,7 +25,6 @@ async function fetchVideoList() {
 function VideoPageContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const videoId = searchParams ? searchParams.get('videoId') : null;
 
   const [videos, setVideos] = useState<Array<{ src: string; title: string; key: string }>>([]);
   const [selectedVideo, setSelectedVideo] = useState<{ src: string; title: string; key: string } | null>(null);
