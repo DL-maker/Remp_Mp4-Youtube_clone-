@@ -62,11 +62,15 @@ body {
   }
 }
 
-@layer base {
-  * {
-    @apply border-border;
+@layer utilities {
+  .bg-background {
+    background-color: var(--background);
   }
-  body {
-    @apply bg-background text-foreground;
+  .text-foreground {
+    color: var(--foreground);
   }
+}
+
+body {
+  @apply bg-background text-foreground;
 }

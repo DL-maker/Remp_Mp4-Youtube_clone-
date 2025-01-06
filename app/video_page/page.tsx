@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import Navbar from "@/components/navbar";
 
-// Fonction pour récupérer la liste des vidéos depuis l'API
 async function fetchVideoList() {
   try {
     const response = await fetch("/api/list-videos");
@@ -13,9 +12,9 @@ async function fetchVideoList() {
     }
     const videoFiles = await response.json();
     return videoFiles.map((name: string) => ({
-      src: `/videos/${name}`, // Chemin relatif vers la vidéo 
-      title: name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()), // Remplace les _ par des espaces et met en majuscule la première lettre de chaque mot
-      key: name // Utilisation du nom du fichier comme clé unique
+      src: `/videos/${name}`,
+      title: name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+      key: name
     }));
   } catch (error) {
     console.error("Erreur lors de la récupération de la liste des vidéos:", error);
@@ -26,10 +25,13 @@ async function fetchVideoList() {
 const VideoPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const videoId = searchParams.get('videoId');
+  const videoId = searchParams ? searchParams.get('videoId') : null;
 
   const [videos, setVideos] = useState<Array<{ src: string; title: string; key: string }>>([]);
   const [selectedVideo, setSelectedVideo] = useState<{ src: string; title: string; key: string } | null>(null);
+  const [username, setUsername] = useState<string>("");
+  const [password, setPassword] = useState<string>("");
+  const [sessionNumber, setSessionNumber] = useState<string>("");
 
   useEffect(() => {
     const loadVideos = async () => {
@@ -48,6 +50,34 @@ const VideoPage = () => {
   function toggleColumn(): void {
     throw new Error("Function not implemented.");
   }
+
+  const handleRegister = async () => {
+    const response = await fetch('/api/auth/register', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    });
+    const data = await response.json();
+    if (response.ok) {
+      setSessionNumber(data.sessionNumber);
+    } else {
+      console.error(data.error);
+    }
+  };
+
+  const handleLogin = async () => {
+    const response = await fetch('/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, password }),
+    });
+    const data = await response.json();
+    if (response.ok) {
+      setSessionNumber(data.sessionNumber);
+    } else {
+      console.error(data.error);
+    }
+  };
 
   return (
     <div>
@@ -81,6 +111,39 @@ const VideoPage = () => {
           </div>
         </div>
       </div>
+      <div className="mt-4">
+        <h2>Register</h2>
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button onClick={handleRegister}>Register</button>
+      </div>
+      <div className="mt-4">
+        <h2>Login</h2>
+        <input
+          type="text"
+          placeholder="Username"
+          value={username}
+          onChange={(e) => setUsername(e.target.value)}
+        />
+        <input
+          type="password"
+          placeholder="Password"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+        />
+        <button onClick={handleLogin}>Login</button>
+      </div>
+      {sessionNumber && <p>Your session number: {sessionNumber}</p>}
     </div>
   );
 };
