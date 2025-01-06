@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, Suspense } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import Navbar from "@/components/navbar";
 
 async function fetchVideoList() {
@@ -24,7 +24,6 @@ async function fetchVideoList() {
 
 function VideoPageContent() {
   const router = useRouter();
-  const searchParams = useSearchParams();
 
   const [videos, setVideos] = useState<Array<{ src: string; title: string; key: string }>>([]);
   const [selectedVideo, setSelectedVideo] = useState<{ src: string; title: string; key: string } | null>(null);

@@ -1,5 +1,5 @@
 'use client';
-import { useState } from "react"; // Ensure this is the correct path
+import { useState, FormEvent } from "react";
 import { signup } from './actions';
 
 // Définition des types
@@ -14,10 +14,16 @@ export interface SignupState {
   };
 }
 
+interface SignupFormData {
+  username: string;
+  email: string;
+  password: string;
+}
+
 // Wrapper pour l'action signup
-const signupAction = async (formData: FormData): Promise<SignupState> => {
+const signupAction = async (formData: SignupFormData): Promise<SignupState> => {
   try {
-    const result = await signup(formData, window.location.origin);
+    const result = await signup(formData as unknown as FormData, window.location.origin);
     if ('error' in result) {
       return {
         success: false,
@@ -41,7 +47,6 @@ const signupAction = async (formData: FormData): Promise<SignupState> => {
 };
 
 function SubmitButton({ pending }: { pending: boolean }) {
- 
   return (
     <button
       type="submit"
@@ -55,18 +60,22 @@ function SubmitButton({ pending }: { pending: boolean }) {
 
 export function SignUpForm() {
   const initialState: SignupState = { error: {} };
-  const [state, setState] = useState(initialState);
+  const [state, setState] = useState<SignupState>(initialState);
+  const [pending, setPending] = useState<boolean>(false);
 
-  const [pending, setPending] = useState(false);
-
-  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit: HandleSubmit = async (event) => {
     event.preventDefault();
     setPending(true);
     const formData = new FormData(event.currentTarget);
-    const result = await signupAction(formData);
+    const result = await signupAction({
+      username: formData.get('username') as string,
+      email: formData.get('email') as string,
+      password: formData.get('password') as string,
+    });
     setState(result);
     setPending(false);
   };
+
   return (
     <div className="w-full max-w-md">
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -111,3 +120,6 @@ export function SignUpForm() {
     </div>
   );
 }
+
+// Define function types
+type HandleSubmit = (e: FormEvent<HTMLFormElement>) => Promise<void>;

@@ -1,11 +1,11 @@
-
 // middleware.ts
 import { withAuth } from 'next-auth/middleware';
+import { NextResponse } from 'next/server';
 
 export default withAuth(
   // `withAuth` augmente votre middleware
-  function middleware(req) {
-    // Votre logique de middleware personnalisée ici (optionnel)
+  function middleware() {
+    return NextResponse.next();
   },
   {
     callbacks: {
