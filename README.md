@@ -1,4 +1,4 @@
-# Remp-mp4 - Local/Web YouTube Clone with Shorts
+# Remp-mp4 - Local YouTube Clone with Shorts
 
 ## Description
 Remp-mp4 is a web application that replicates YouTube's core functionalities, including regular videos and shorts. Built with Next.js and Tailwind CSS, the application allows you to manage your videos locally while providing a YouTube-like experience.
