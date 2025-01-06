@@ -1,4 +1,3 @@
-
 // app/vos_videos/page.tsx
 "use client";
 import React, { useState, useEffect } from 'react';
@@ -25,15 +24,26 @@ const VosVideosPage = () => {
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoType, setVideoType] = useState('normale');
   const [isUploading, setIsUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchVideos = async () => {
       try {
         const response = await fetch('/api/videos');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
         const data = await response.json();
         setVideos(data);
-      } catch {
-        console.error('Failed to fetch videos');
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError('An unknown error occurred');
+        }
+      } finally {
+        setLoading(false);
       }
     };
 
@@ -96,6 +106,9 @@ const VosVideosPage = () => {
       setIsUploading(false);
     }
   };
+
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
 
   return (
     <div className="p-4">
