@@ -109,7 +109,6 @@ const VosVideosPage = () => {
 
   if (loading) return <div>Loading...</div>;
   if (error) return <div>Error: {error}</div>;
-
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-6">Tableau de Bord</h1>

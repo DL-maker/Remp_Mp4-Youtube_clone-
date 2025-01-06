@@ -146,6 +146,7 @@ function VideoPageContent() {
         </div>
         {sessionNumber && <p>Your session number: {sessionNumber}</p>}
       </div>
+
     </Suspense>
   );
 }
