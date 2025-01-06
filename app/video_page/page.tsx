@@ -79,6 +79,13 @@ function VideoPageContent() {
     }
   };
 
+  const handleVideoClick = (videoId: string) => {
+    router.push(`/video_page?videoId=${videoId}`);
+    setTimeout(() => {
+      window.location.reload();
+    }, 1000);
+  };
+
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <div>
@@ -101,7 +108,7 @@ function VideoPageContent() {
             <h2 className="text-xl font-bold mb-4">Autres vidéos</h2>
             <div className="space-y-4">
               {videos.map((video) => (
-                <div key={video.key} className="cursor-pointer" onClick={() => router.push(`/video_page?videoId=${video.key}`)}>
+                <div key={video.key} className="cursor-pointer" onClick={() => handleVideoClick(video.key)}>
                   <video width="100%" className="rounded-lg">
                     <source src={video.src} type="video/mp4" />
                     Votre navigateur ne supporte pas la lecture des vidéos.

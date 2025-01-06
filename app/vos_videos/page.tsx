@@ -2,8 +2,9 @@
 "use client";
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
+import Navbar from "@/components/navbar";
 
-const generateRandomData = () => {
+function generateRandomData() {
   return Array.from({ length: 7 }, () => ({
     date: `Day ${Math.floor(Math.random() * 30) + 1}`,
     abonnés: Math.floor(Math.random() * 100),
@@ -11,7 +12,7 @@ const generateRandomData = () => {
     likes: Math.floor(Math.random() * 100),
     dislikes: Math.floor(Math.random() * 100),
   }));
-};
+}
 
 const VosVideosPage = () => {
   const [data, setData] = useState(generateRandomData());
@@ -111,6 +112,7 @@ const VosVideosPage = () => {
   if (error) return <div>Error: {error}</div>;
   return (
     <div className="p-4">
+      <Navbar toggleColumn={() => { /* implement toggleColumn functionality here */ }} />
       <h1 className="text-2xl font-bold mb-6">Tableau de Bord</h1>
       
       <ResponsiveContainer width="100%" height={400}>
