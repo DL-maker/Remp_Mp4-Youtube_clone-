@@ -133,6 +133,21 @@ export default function SignInPage() {
               Sign in with Discord
             </button>
           </div>
+
+          {/* Add a button to toggle the column */}
+          <button
+            onClick={toggleColumn}
+            className="w-full py-2 px-4 bg-gray-500 text-white rounded hover:bg-gray-600 transition-colors mt-4"
+          >
+            Toggle Column
+          </button>
+
+          {/* Use isColumnOpen to conditionally render content */}
+          {isColumnOpen && (
+            <div className="mt-4 p-4 bg-gray-200 rounded">
+              <p>Column is open!</p>
+            </div>
+          )}
         </div>
       </div>
     </>

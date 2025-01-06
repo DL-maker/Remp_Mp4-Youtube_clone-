@@ -2,7 +2,7 @@ import NextAuth from "next-auth";
 import GoogleProvider from "next-auth/providers/google";
 import GitHubProvider from "next-auth/providers/github";
 import DiscordProvider from "next-auth/providers/discord";
-import { getSession, GetSessionParams } from 'next-auth/react';
+import { getSession, GetSessionParams, signIn } from 'next-auth/react';
 
 const options = {
   providers: [
@@ -28,7 +28,7 @@ if (!options.providers || options.providers.length === 0) {
 
 const auth = NextAuth(options);
 
-export { auth };
+export { auth, signIn };
 
 export async function getServerSideProps(context: GetSessionParams | undefined) {
   const session = await getSession(context);

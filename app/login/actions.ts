@@ -59,7 +59,12 @@ export async function signup(formData: FormData, baseUrl: string): Promise<Signu
 
     // Création de l'utilisateur dans la base de données
     const user = await prisma.user.create({
-      data: { username, email, passwordHash: hashedPassword },
+      data: { 
+        username, 
+        email, 
+        passwordHash: hashedPassword,
+        role: 'USER' // Add the role property
+      },
       select: { id: true, username: true, email: true },
     });
 
@@ -67,7 +72,7 @@ export async function signup(formData: FormData, baseUrl: string): Promise<Signu
 
     // Tentative de création de la session
     try {
-      await createSession(user.id);
+      await createSession(user.id.toString());
       console.log('Session created for user:', user.id);
     } catch (sessionError) {
       console.error('Session creation failed:', sessionError);
