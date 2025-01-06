@@ -6,6 +6,7 @@ import ColumnOfVideo from "@/components/column_of_video";
 import Navbar from "@/components/navbar";
 import { useRouter } from 'next/navigation';
 
+
 interface CollapsibleColumnProps {
   isOpen: boolean;
   toggleColumn: () => void;

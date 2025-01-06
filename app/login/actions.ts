@@ -59,6 +59,7 @@ export async function signup(formData: FormData, baseUrl: string): Promise<Signu
 
     // Création de l'utilisateur dans la base de données
     const user = await prisma.user.create({
+
       data: { username, email, passwordHash: hashedPassword, role: 'USER' },
       select: { id: true, username: true, email: true },
     });
@@ -87,7 +88,7 @@ export async function signup(formData: FormData, baseUrl: string): Promise<Signu
     };
 
   } catch (error) {
-    console.error('Signup error:', error);
+    console.error('Signup error:', error instanceof Error ? { message: error.message } : error || {});
     return {
       success: false,
       error: { username: ['An unexpected error occurred. Please try again.'] },

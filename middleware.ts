@@ -1,3 +1,4 @@
+
 // middleware.ts
 import { withAuth } from 'next-auth/middleware';
 
@@ -25,3 +26,4 @@ export const config = {
     // "/dashboard/:path*",
   ]
 };
+
