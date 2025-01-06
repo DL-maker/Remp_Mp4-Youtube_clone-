@@ -1,6 +1,5 @@
 'use client';
-import { useState } from "react";
-import { useFormStatus } from "react-dom";
+import { useState } from "react"; // Ensure this is the correct path
 import { signup } from './actions';
 
 // Définition des types
@@ -41,8 +40,7 @@ const signupAction = async (formData: FormData): Promise<SignupState> => {
   }
 };
 
-function SubmitButton() {
-  const { pending } = useFormStatus();
+function SubmitButton({ pending }: { pending: boolean }) {
  
   return (
     <button
@@ -59,13 +57,16 @@ export function SignUpForm() {
   const initialState: SignupState = { error: {} };
   const [state, setState] = useState(initialState);
 
+  const [pending, setPending] = useState(false);
+
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
+    setPending(true);
     const formData = new FormData(event.currentTarget);
     const result = await signupAction(formData);
     setState(result);
+    setPending(false);
   };
-
   return (
     <div className="w-full max-w-md">
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -105,7 +106,7 @@ export function SignUpForm() {
           )}
         </div>
 
-        <SubmitButton />
+        <SubmitButton pending={pending} />
       </form>
     </div>
   );
