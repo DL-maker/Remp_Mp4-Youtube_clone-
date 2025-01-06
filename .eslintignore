@@ -1,0 +1,11 @@
+.next
+node_modules
+build
+dist
+coverage
+*.config.js
+.cache
+out
+public
+*.d.ts
+**/*.js.map

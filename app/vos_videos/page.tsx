@@ -1,8 +1,7 @@
 // app/vos_videos/page.tsx
 "use client";
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-
 
 const generateRandomData = () => {
   return Array.from({ length: 7 }, () => ({
@@ -24,30 +23,50 @@ const VosVideosPage = () => {
   }>>([]);
   const [videoFile, setVideoFile] = useState<File | null>(null);
   const [videoType, setVideoType] = useState('normale');
-  const [error, setError] = useState<string | null>(null);
   const [isUploading, setIsUploading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchVideos = async () => {
+      try {
+        const response = await fetch('/api/videos');
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+        const data = await response.json();
+        setVideos(data);
+      } catch (err) {
+        if (err instanceof Error) {
+          setError(err.message);
+        } else {
+          setError('An unknown error occurred');
+        }
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchVideos();
+  }, []);
 
   const handleFileChange = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (file) {
       // Vérifier si c'est une vidéo
       if (!file.type.includes('video/')) {
-        setError('Veuillez sélectionner un fichier vidéo (MP4 ou WebM)');
         return;
       }
       setVideoFile(file);
-      setError(null);
     }
   };
 
   const handlePublish = async () => {
     if (!videoFile) {
-      setError('Veuillez sélectionner une vidéo');
       return;
     }
 
     setIsUploading(true);
-    setError(null);
 
     const formData = new FormData();
     formData.append('file', videoFile);
@@ -83,12 +102,13 @@ const VosVideosPage = () => {
 
     } catch (err) {
       console.error('Erreur lors du téléchargement:', err);
-      setError('Erreur lors du téléchargement. Veuillez réessayer.');
     } finally {
       setIsUploading(false);
     }
   };
 
+  if (loading) return <div>Loading...</div>;
+  if (error) return <div>Error: {error}</div>;
   return (
     <div className="p-4">
       <h1 className="text-2xl font-bold mb-6">Tableau de Bord</h1>
@@ -172,5 +192,4 @@ const VosVideosPage = () => {
     </div>
   );
 };
-
 export default VosVideosPage;

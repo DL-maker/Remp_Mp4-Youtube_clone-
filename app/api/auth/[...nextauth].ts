@@ -46,7 +46,7 @@ export default NextAuth({
           bcrypt.compareSync(credentials.password as string, user.passwordHash as string)
         ) {
           return {
-            id: user.id,
+            id: user.id.toString(),
             name: user.username,
             email: user.email,
           };
