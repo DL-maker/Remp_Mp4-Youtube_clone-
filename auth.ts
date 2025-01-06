@@ -18,6 +18,7 @@ const options = {
       clientId: process.env.DISCORD_CLIENT_ID || "",
       clientSecret: process.env.DISCORD_CLIENT_SECRET || "",
     }),
+    // ...other providers if any...
   ],
   secret: process.env.NEXTAUTH_SECRET,
 };
