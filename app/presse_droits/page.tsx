@@ -4,16 +4,16 @@ export default function PresseDroits() {
   return (
     <>
       <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-      <title>Presse - Droits d'auteur de Remp-mp4</title>
+      <title>Presse - Droits d&#39;auteur de Remp-mp4</title>
       <header>
-        <h1>Presse - Droits d'auteur de Remp-mp4</h1>
+        <h1>Presse - Droits d&#39;auteur de Remp-mp4</h1>
       </header>
       <main>
         <h2>Introduction</h2>
-        <p>Chez Remp-mp4, nous prenons les droits d'auteur très au sérieux. Cette page vise à informer la presse, les créateurs de contenu et le grand public sur nos politiques et initiatives en matière de droits d'auteur.</p>
+        <p>Chez Remp-mp4, nous prenons les droits d&#39;auteur très au sérieux. Cette page vise à informer la presse, les créateurs de contenu et le grand public sur nos politiques et initiatives en matière de droits d&#39;auteur.</p>
 
         <h2>Politique de droits d'auteur</h2>
-        <p>Remp-mp4 respecte et applique la loi sur les droits d'auteur, y compris le Digital Millennium Copyright Act (DMCA) aux États-Unis et les réglementations similaires dans d'autres pays. Nous fournissons des outils pour :</p>
+        <p>Remp-mp4 respecte et applique la loi sur les droits d&#39;auteur, y compris le Digital Millennium Copyright Act (DMCA) aux États-Unis et les réglementations similaires dans d'autres pays. Nous fournissons des outils pour :</p>
         <ul>
           <li>Identifier les violations potentielles des droits d'auteur.</li>
           <li>Permettre aux détenteurs de droits de signaler les contenus concernés.</li>

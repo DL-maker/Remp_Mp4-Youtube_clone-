@@ -5,7 +5,6 @@ import Image from 'next/image';
 import ColumnOfVideo from "@/components/column_of_video";
 import Navbar from "@/components/navbar";
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 
 
 interface CollapsibleColumnProps {
