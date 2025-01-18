@@ -24,12 +24,16 @@ async function fetchVideoList() {
 
 function VideoPageContent() {
   const router = useRouter();
-
+  const [isOpen, setIsOpen] = useState(false);
   const [videos, setVideos] = useState<Array<{ src: string; title: string; key: string }>>([]);
   const [selectedVideo, setSelectedVideo] = useState<{ src: string; title: string; key: string } | null>(null);
   const [username, setUsername] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [sessionNumber, setSessionNumber] = useState<string>("");
+
+  const toggleColumn = () => {
+    setIsOpen(!isOpen);
+  };
 
   useEffect(() => {
     const loadVideos = async () => {
@@ -46,10 +50,6 @@ function VideoPageContent() {
 
     loadVideos();
   }, []);
-
-  function toggleColumn(): void {
-    throw new Error("Function not implemented.");
-  }
 
   const handleRegister = async () => {
     const response = await fetch('/api/auth/register', {
@@ -89,7 +89,7 @@ function VideoPageContent() {
   return (
     <Suspense fallback={<div>Loading...</div>}>
       <div>
-        <Navbar toggleColumn={toggleColumn} />
+        <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
         <div className="flex">
           <div className="flex-1 p-4">
             {selectedVideo ? (
@@ -153,7 +153,6 @@ function VideoPageContent() {
         </div>
         {sessionNumber && <p>Your session number: {sessionNumber}</p>}
       </div>
-
     </Suspense>
   );
 }

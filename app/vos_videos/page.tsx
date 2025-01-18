@@ -1,4 +1,3 @@
-// app/vos_videos/page.tsx
 "use client";
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
@@ -15,6 +14,7 @@ function generateRandomData() {
 }
 
 const VosVideosPage = () => {
+  const [isOpen, setIsOpen] = useState(false);
   const [data, setData] = useState(generateRandomData());
   const [videos, setVideos] = useState<Array<{
     id: number;
@@ -27,6 +27,10 @@ const VosVideosPage = () => {
   const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+
+  const toggleColumn = () => {
+    setIsOpen(!isOpen);
+  };
 
   useEffect(() => {
     const fetchVideos = async () => {
@@ -108,11 +112,27 @@ const VosVideosPage = () => {
     }
   };
 
-  if (loading) return <div>Loading...</div>;
-  if (error) return <div>Error: {error}</div>;
+  if (loading) {
+    return (
+      <div>
+        <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
+        <div>Loading...</div>
+      </div>
+    );
+  }
+  
+  if (error) {
+    return (
+      <div>
+        <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
+        <div>Error: {error}</div>
+      </div>
+    );
+  }
+
   return (
     <div className="p-4">
-      <Navbar toggleColumn={() => { /* implement toggleColumn functionality here */ }} />
+      <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
       <h1 className="text-2xl font-bold mb-6">Tableau de Bord</h1>
       
       <ResponsiveContainer width="100%" height={400}>
@@ -194,4 +214,5 @@ const VosVideosPage = () => {
     </div>
   );
 };
+
 export default VosVideosPage;
