@@ -18,10 +18,10 @@ export default function TermsOfService() {
           {/* En-tête */}
           <div className="px-6 py-8">
             <h1 className="text-3xl font-bold text-gray-900 mb-6">
-              Conditions d'utilisation
+              Conditions d&apos;utilisation
             </h1>
             <p className="text-gray-600 mb-8">
-              Ces conditions d'utilisation régissent votre utilisation de notre
+              Ces conditions d&apos;utilisation régissent votre utilisation de notre
               service. Veuillez les lire attentivement.
             </p>
 
@@ -46,7 +46,7 @@ export default function TermsOfService() {
                       <li>Incitation à la haine ou discrimination</li>
                       <li>Harcèlement sexuel</li>
                       <li>Atteinte à la dignité humaine</li>
-                      <li>Apologie de crimes contre l'humanité</li>
+                      <li>Apologie de crimes contre l&apos;humanité</li>
                       <li>Promotion du terrorisme</li>
                       <li>Apologie de crimes graves</li>
                     </ul>
