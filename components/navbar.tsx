@@ -180,7 +180,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleColumn, isOpen }) => {
             <hr className="my-2 border-black" />
             <div className="px-4 py-2 text-gray-700">
                 <p className="cursor-pointer hover:underline" onClick={() => router.push('/presse_droits')}>Presse Droits d&apos;auteur</p>
-              <p className="cursor-pointer hover:underline">Nous contacter</p>
+              <p className="cursor-pointer hover:underline" onClick={() => router.push('/nous_contacter')}>Nous contacter</p>
               <p className="cursor-pointer hover:underline">Publicité</p>
               <p className="cursor-pointer hover:underline">Conditions d&apos;utilisation</p>
               <p className="cursor-pointer hover:underline">Confidentialité</p>
