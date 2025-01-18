@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect } from 'react';
+import React, {useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -181,7 +181,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleColumn, isOpen }) => {
             <div className="px-4 py-2 text-gray-700">
                 <p className="cursor-pointer hover:underline" onClick={() => router.push('/presse_droits')}>Presse Droits d&apos;auteur</p>
               <p className="cursor-pointer hover:underline" onClick={() => router.push('/nous_contacter')}>Nous contacter</p>
-              <p className="cursor-pointer hover:underline">Publicité</p>
+              <p className="cursor-pointer hover:underline" onClick={() => router.push('/publicite')}>Publicité</p>
               <p className="cursor-pointer hover:underline">Conditions d&apos;utilisation</p>
               <p className="cursor-pointer hover:underline">Confidentialité</p>
               <p className="cursor-pointer hover:underline">Règles et sécurité</p>
