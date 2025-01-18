@@ -182,7 +182,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleColumn, isOpen }) => {
                 <p className="cursor-pointer hover:underline" onClick={() => router.push('/presse_droits')}>Presse Droits d&apos;auteur</p>
               <p className="cursor-pointer hover:underline" onClick={() => router.push('/nous_contacter')}>Nous contacter</p>
               <p className="cursor-pointer hover:underline" onClick={() => router.push('/publicite')}>Publicité</p>
-              <p className="cursor-pointer hover:underline">Conditions d&apos;utilisation</p>
+              <p className="cursor-pointer hover:underline" onClick={() => router.push('/condition')}>Conditions d&apos;utilisation</p>
               <p className="cursor-pointer hover:underline">Confidentialité</p>
               <p className="cursor-pointer hover:underline">Règles et sécurité</p>
               <p className="mt-4">&copy; 2025 LD-Makeur</p>
