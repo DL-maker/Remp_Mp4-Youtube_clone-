@@ -149,7 +149,7 @@ function VideoPageContent() {
                   ) : (
                     <>
                       <MdOutlineSubscriptions className="text-2xl mr-2" />
-                      S'abonner
+                      S&apos;abonner
                     </>
                   )}
                 </button>
