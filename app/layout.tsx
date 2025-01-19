@@ -25,6 +25,7 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head><title>Remp MP4</title></head>
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
