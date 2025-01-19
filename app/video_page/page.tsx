@@ -1,7 +1,9 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
+import { AiOutlineLike, AiFillLike, AiOutlineDislike, AiFillDislike } from "react-icons/ai";
+import { MdSubscriptions, MdOutlineSubscriptions } from "react-icons/md";
 import Navbar from "@/components/navbar";
 
 async function fetchVideoList() {
@@ -14,7 +16,7 @@ async function fetchVideoList() {
     return videoFiles.map((name: string) => ({
       src: `/videos/${name}`,
       title: name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
-      key: name
+      key: name,
     }));
   } catch (error) {
     console.error("Erreur lors de la récupération de la liste des vidéos:", error);
@@ -27,6 +29,11 @@ function VideoPageContent() {
   const [isOpen, setIsOpen] = useState(false);
   const [videos, setVideos] = useState<Array<{ src: string; title: string; key: string }>>([]);
   const [selectedVideo, setSelectedVideo] = useState<{ src: string; title: string; key: string } | null>(null);
+  const [likes, setLikes] = useState(0);
+  const [dislikes, setDislikes] = useState(0);
+  const [isSubscribed, setIsSubscribed] = useState(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isDisliked, setIsDisliked] = useState(false);
 
   const toggleColumn = () => {
     setIsOpen(!isOpen);
@@ -48,7 +55,6 @@ function VideoPageContent() {
     loadVideos();
   }, []);
 
-
   const handleVideoClick = (videoId: string) => {
     router.push(`/video_page?videoId=${videoId}`);
     setTimeout(() => {
@@ -56,57 +62,125 @@ function VideoPageContent() {
     }, 1000);
   };
 
+  const toggleSubscription = () => {
+    setIsSubscribed(!isSubscribed);
+  };
+
+  const handleLike = () => {
+    if (isLiked) {
+      setLikes(likes - 1);
+    } else {
+      setLikes(likes + 1);
+      if (isDisliked) {
+        setIsDisliked(false);
+        setDislikes(dislikes - 1);
+      }
+    }
+    setIsLiked(!isLiked);
+  };
+
+  const handleDislike = () => {
+    if (isDisliked) {
+      setDislikes(dislikes - 1);
+    } else {
+      setDislikes(dislikes + 1);
+      if (isLiked) {
+        setIsLiked(false);
+        setLikes(likes - 1);
+      }
+    }
+    setIsDisliked(!isDisliked);
+  };
+
   return (
-      <div className="min-h-screen bg-gray-50">
-        <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
-        <div className="flex flex-col md:flex-row">
-          <div className="flex-1 p-6">
-            {selectedVideo ? (
-              <div>
-                <video
-                  width="100%"
-                  controls
-                  autoPlay
-                  className="rounded-lg shadow-lg mb-6"
+    <div className="min-h-screen bg-gray-50">
+      <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
+      <div className="flex flex-col md:flex-row">
+        <div className="flex-1 p-6">
+          {selectedVideo ? (
+            <div>
+              <video width="100%" controls autoPlay className="rounded-lg shadow-lg mb-6">
+                <source src={selectedVideo.src} type="video/mp4" />
+                Votre navigateur ne supporte pas la lecture des vidéos.
+              </video>
+              <h1 className="text-3xl font-bold text-gray-800">{selectedVideo.title}</h1>
+
+              {/* Boutons d'interaction */}
+              <div className="flex items-center justify-between mt-4">
+                <div className="flex space-x-4 items-center">
+                  <button
+                    className="flex items-center text-gray-600 hover:text-blue-600 transition"
+                    onClick={handleLike}
+                  >
+                    {isLiked ? (
+                      <AiFillLike className="text-2xl mr-1" />
+                    ) : (
+                      <AiOutlineLike className="text-2xl mr-1" />
+                    )}
+                    <span>{likes}</span>
+                  </button>
+
+                  <button
+                    className="flex items-center text-gray-600 hover:text-red-600 transition"
+                    onClick={handleDislike}
+                  >
+                    {isDisliked ? (
+                      <AiFillDislike className="text-2xl mr-1" />
+                    ) : (
+                      <AiOutlineDislike className="text-2xl mr-1" />
+                    )}
+                    <span>{dislikes}</span>
+                  </button>
+                </div>
+
+                <button
+                  className={`flex items-center text-white px-4 py-2 rounded-lg font-bold shadow-md transition ${
+                    isSubscribed
+                      ? "bg-gray-500 hover:bg-gray-600"
+                      : "bg-red-600 hover:bg-red-700"
+                  }`}
+                  onClick={toggleSubscription}
                 >
-                  <source src={selectedVideo.src} type="video/mp4" />
+                  {isSubscribed ? (
+                    <>
+                      <MdSubscriptions className="text-2xl mr-2" />
+                      Abonné(e)
+                    </>
+                  ) : (
+                    <>
+                      <MdOutlineSubscriptions className="text-2xl mr-2" />
+                      S'abonner
+                    </>
+                  )}
+                </button>
+              </div>
+            </div>
+          ) : (
+            <p className="text-gray-600">Chargement de la vidéo...</p>
+          )}
+        </div>
+
+        {/* Section pour les autres vidéos */}
+        <div className="w-full md:w-1/3 p-6 bg-white shadow-md rounded-lg">
+          <h2 className="text-2xl font-bold text-gray-700 mb-4">Autres vidéos</h2>
+          <div className="space-y-4">
+            {videos.map((video) => (
+              <div
+                key={video.key}
+                className="cursor-pointer hover:bg-gray-100 p-2 rounded-lg"
+                onClick={() => handleVideoClick(video.key)}
+              >
+                <video width="100%" className="rounded-lg shadow">
+                  <source src={video.src} type="video/mp4" />
                   Votre navigateur ne supporte pas la lecture des vidéos.
                 </video>
-                <h1 className="text-3xl font-bold text-gray-800">
-                  {selectedVideo.title}
-                </h1>
-                <p>It&apos;s a great video!</p>
+                <p className="mt-2 text-gray-600 font-medium">{video.title}</p>
               </div>
-            ) : (
-              <p className="text-gray-600">Chargement de la vidéo...</p>
-            )}
-          </div>
-          <div className="w-full md:w-1/3 p-6 bg-white shadow-md rounded-lg">
-            <h2 className="text-2xl font-bold text-gray-700 mb-4">
-              Autres vidéos
-            </h2>
-            <div className="space-y-4">
-              {videos.map((video) => (
-                <div
-                  key={video.key}
-                  className="cursor-pointer hover:bg-gray-100 p-2 rounded-lg"
-                  onClick={() => handleVideoClick(video.key)}
-                >
-                  <video width="100%" className="rounded-lg shadow">
-                    <source src={video.src} type="video/mp4" />
-                    Votre navigateur ne supporte pas la lecture des vidéos.
-                  </video>
-                  <p className="mt-2 text-gray-600 font-medium">
-                    {video.title}
-                  </p>
-                </div>
-              ))}
-            </div>
-            <p>Don&apos;t miss it!</p>
+            ))}
           </div>
         </div>
       </div>
-    
+    </div>
   );
 }
 
