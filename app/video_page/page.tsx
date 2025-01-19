@@ -27,9 +27,6 @@ function VideoPageContent() {
   const [isOpen, setIsOpen] = useState(false);
   const [videos, setVideos] = useState<Array<{ src: string; title: string; key: string }>>([]);
   const [selectedVideo, setSelectedVideo] = useState<{ src: string; title: string; key: string } | null>(null);
-  const [username, setUsername] = useState<string>("");
-  const [password, setPassword] = useState<string>("");
-  const [sessionNumber, setSessionNumber] = useState<string>("");
 
   const toggleColumn = () => {
     setIsOpen(!isOpen);
@@ -51,33 +48,6 @@ function VideoPageContent() {
     loadVideos();
   }, []);
 
-  const handleRegister = async () => {
-    const response = await fetch("/api/auth/register", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password })
-    });
-    const data = await response.json();
-    if (response.ok) {
-      setSessionNumber(data.sessionNumber);
-    } else {
-      console.error(data.error);
-    }
-  };
-
-  const handleLogin = async () => {
-    const response = await fetch("/api/auth/login", {
-      method: "POST",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ username, password })
-    });
-    const data = await response.json();
-    if (response.ok) {
-      setSessionNumber(data.sessionNumber);
-    } else {
-      console.error(data.error);
-    }
-  };
 
   const handleVideoClick = (videoId: string) => {
     router.push(`/video_page?videoId=${videoId}`);
