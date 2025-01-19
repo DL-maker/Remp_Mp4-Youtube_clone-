@@ -1,4 +1,4 @@
-"use client";
+'use client';
 
 import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
@@ -84,6 +84,8 @@ const ColumnOfVideo = () => {
 
   return (
     <div className="p-4">
+      <h1 className="text-2xl font-bold mb-4 text-center">Galerie de Vidéos</h1>
+
       {error && (
         <div className="bg-red-100 text-red-800 p-4 rounded-lg mb-4 text-center">
           {error}
@@ -91,9 +93,9 @@ const ColumnOfVideo = () => {
       )}
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
-        {videos.map((video) => (
+        {videos.map((video, index) => (
           <div
-            key={video.key}
+            key={`${video.key}-${index}`} // Assurez-vous que la clé est unique
             className="group relative cursor-pointer rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-shadow"
             onClick={() => router.push(`/video_page?videoId=${video.key}`)}
             role="button"
@@ -115,11 +117,8 @@ const ColumnOfVideo = () => {
               Votre navigateur ne supporte pas la lecture des vidéos.
             </video>
 
-            {/* Titre de la vidéo */}
-            <p className="mt-4 text-center font-medium text-lg text-gray-800">{video.title}</p>
-
             {/* Profil en dessous */}
-            <div className="flex items-center mt-2 space-x-2 justify-center">
+            <div className="flex items-center mt-4 space-x-2">
               <Image
                 src={"https://thispersondoesnotexist.com"}
                 alt="Profile"
