@@ -36,7 +36,7 @@ const SettingsPage = () => {
       router.push("/"); // Rediriger l'utilisateur après la suppression
     } else {
       // Afficher un message indiquant qu'il n'y a pas de compte
-      alert("Il n'y a pas de compte à supprimer.");
+      alert("Il n&apos;y a pas de compte à supprimer.");
     }
   };
 
@@ -89,7 +89,7 @@ const SettingsPage = () => {
         {/* Input pour entrer l'URL de l'API */}
         <div className="mb-8">
           <label htmlFor="api-url" className="block text-xl font-medium text-gray-700 mb-2">
-            URL de l'API
+            URL de l&apos;API
           </label>
           <input
             type="text"

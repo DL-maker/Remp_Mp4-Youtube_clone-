@@ -43,7 +43,7 @@ export default function EmergencyReportPage() {
         <div className="flex-grow flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg shadow-md text-center">
             <h1 className="text-2xl font-bold text-green-600">Signalement envoyé avec succès !</h1>
-            <p className="mt-4">Merci d'avoir signalé ce problème. Nous vous contacterons si nécessaire.</p>
+            <p className="mt-4">Merci d&apos;avoir signalé ce problème. Nous vous contacterons si nécessaire.</p>
           </div>
         </div>
       </div>

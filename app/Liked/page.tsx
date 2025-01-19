@@ -38,7 +38,7 @@ const LikedVideosPage = () => {
 
       {likedVideos.length === 0 ? (
         <div className="text-center text-gray-500">
-          <p>Aucune vidéo n'a été likée pour le moment.</p>
+          <p>Aucune vidéo n&apos;a été likée pour le moment.</p>
         </div>
       ) : (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
