@@ -106,6 +106,7 @@ function VideoPageContent() {
                 <h1 className="text-3xl font-bold text-gray-800">
                   {selectedVideo.title}
                 </h1>
+                <p>It&apos;s a great video!</p>
               </div>
             ) : (
               <p className="text-gray-600">Chargement de la vidéo...</p>
@@ -132,10 +133,11 @@ function VideoPageContent() {
                 </div>
               ))}
             </div>
+            <p>Don&apos;t miss it!</p>
           </div>
         </div>
         <div className="mt-8 px-6">
-          <h2 className="text-2xl font-bold text-gray-700 mb-4">S'enregistrer</h2>
+          <h2 className="text-2xl font-bold text-gray-700 mb-4">S&apos;enregistrer</h2>
           <div className="flex flex-col md:flex-row items-center gap-4">
             <input
               type="text"
@@ -155,7 +157,7 @@ function VideoPageContent() {
               onClick={handleRegister}
               className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
             >
-              S'enregistrer
+              S&apos;enregistrer
             </button>
           </div>
         </div>

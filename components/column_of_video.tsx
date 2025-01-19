@@ -52,7 +52,7 @@ const ColumnOfVideo = () => {
         if (newVideos.length < limit) {
           setHasMore(false);
         }
-      } catch (err) {
+      } catch {
         setError("Une erreur est survenue lors du chargement des vidéos.");
       } finally {
         setLoading(false);
