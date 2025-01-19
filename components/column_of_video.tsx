@@ -84,7 +84,6 @@ const ColumnOfVideo = () => {
 
   return (
     <div className="p-4">
-      <h1 className="text-2xl font-bold mb-4 text-center">Galerie de Vidéos</h1>
 
       {error && (
         <div className="bg-red-100 text-red-800 p-4 rounded-lg mb-4 text-center">
