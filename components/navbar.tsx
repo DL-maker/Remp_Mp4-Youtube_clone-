@@ -117,7 +117,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleColumn, isOpen }) => {
         {isOpen && (
         <>
           <div className="flex flex-col space-y-2 mt-4">
-            <button className="flex items-center space-x-2 px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 transition">
+            <button className="flex items-center space-x-2 px-4 py-2 bg-gray-200 rounded-md hover:bg-gray-300 transition" onClick={() => router.push('/')}>
               <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor" >
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7m-9 2v12m-4-4h16" />
               </svg>
