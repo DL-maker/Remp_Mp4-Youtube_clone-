@@ -4,6 +4,7 @@ import React, {useRef, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
+import logo from '@/public/Logo_light_mode.png'; // Ensure you have a high-resolution logo
 
 interface NavbarProps {
   toggleColumn: () => void;
@@ -48,11 +49,11 @@ const Navbar: React.FC<NavbarProps> = ({ toggleColumn, isOpen }) => {
               </button>
               <Link href="/">
                 <Image
-                  src="/Logo_light_mode.png"
+                  src={logo}
                   alt="Logo"
-                  width={40}
-                  height={40}
-                  className="h-10 w-auto cursor-pointer"
+                  width={150}
+                  height={50}
+                  className="logo"
                 />
               </Link>
             </div>
@@ -106,11 +107,11 @@ const Navbar: React.FC<NavbarProps> = ({ toggleColumn, isOpen }) => {
             </svg>
           </button>
           <Image
-            src="/Logo_light_mode.png"
+            src={logo}
             alt="Logo"
-            width={40}
-            height={40}
-            className="h-10 w-auto cursor-pointer"
+            width={150}
+            height={50}
+            className="logo"
             onClick={() => window.location.reload()}
           />
         </div>
