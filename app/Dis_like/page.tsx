@@ -3,6 +3,7 @@
 import React from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
+import { useState } from 'react';
 import Navbar from "@/components/navbar";
 // Exemple de vidéos likées (Remplacez par des données réelles ou connectez une API)
 const likedVideos = [
@@ -25,11 +26,16 @@ const likedVideos = [
 
 const DisLikedVideosPage = () => {
   const router = useRouter();
+  const [isOpen, setIsOpen] = useState(false);
+  const toggleColumn = () => {
+    setIsOpen(!isOpen);
+  };
 
   return (
     <div className="p-4">
+        <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
       <h1 className="text-2xl font-bold mb-4 r">Vidéos Dis-Likées</h1>
-
+      
       {likedVideos.length === 0 ? (
         <div className="text-center text-gray-500">
           <p>Aucune vidéo n'a été likée pour le moment.</p>
