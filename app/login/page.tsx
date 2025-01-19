@@ -1,10 +1,10 @@
 'use client';
-import { signIn } from "next-auth/react";
-import { SignUpForm } from "./form";
-import { useState } from "react";
-import Navbar from "@/components/navbar";
 
-// Définition des types
+import { signIn } from 'next-auth/react';
+import { SignUpForm } from './form';
+import { useState } from 'react';
+import Navbar from '@/components/navbar';
+
 interface LoginState {
   error?: string;
 }
@@ -25,7 +25,7 @@ const loginAction = async (formData: FormData): Promise<LoginState> => {
     return { error: result.error };
   } catch (e) {
     console.error('Login error:', e);
-    return { error: 'An unexpected error occurred' };
+    return { error: 'An unexpected error occurred. Please try again.' };
   }
 };
 
@@ -40,7 +40,7 @@ function LoginForm() {
   };
 
   return (
-    <div className="w-full max-w-md">
+    <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <input
@@ -48,27 +48,26 @@ function LoginForm() {
             type="text"
             placeholder="Username"
             required
-            className="w-full p-2 border rounded"
+            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-
         <div>
           <input
             name="password"
             type="password"
             placeholder="Password"
             required
-            className="w-full p-2 border rounded"
+            className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
           />
         </div>
-
         {state.error && (
-          <span className="text-red-500 text-sm">{state.error}</span>
+          <div className="text-red-600 text-sm p-2 bg-red-100 rounded">
+            {state.error}
+          </div>
         )}
-
         <button
           type="submit"
-          className="w-full bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
+          className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200"
         >
           Log In
         </button>
@@ -78,66 +77,74 @@ function LoginForm() {
 }
 
 export default function SignInPage() {
-  const [isSignUp, setIsSignUp] = useState(true); // Default to sign up
-  const [isColumnOpen, setIsColumnOpen] = useState(false); // Default to closed
+  const [isSignUp, setIsSignUp] = useState(true);
+  const [isColumnOpen, setIsColumnOpen] = useState(false);
 
-  const toggleColumn = () => { // Function to toggle column
+  const toggleColumn = () => {
     setIsColumnOpen((prev) => !prev);
   };
 
   return (
     <>
-    <Navbar toggleColumn={toggleColumn} isOpen={isColumnOpen} />
-      <div className="min-h-screen flex flex-col items-center justify-center p-4">
+      <Navbar toggleColumn={toggleColumn} isOpen={isColumnOpen} />
+      <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
         <div className="w-full max-w-md space-y-8">
-          <h1 className="text-2xl font-bold text-center mb-8">
-            {isSignUp ? 'Sign Up' : 'Sign In'}
+          <h1 className="text-2xl font-bold text-center mb-6">
+            {isSignUp ? 'Create an Account' : 'Welcome Back'}
           </h1>
-          
-          <div className="flex justify-center space-x-4 mb-4">
+
+          {/* Toggle between Sign Up and Sign In */}
+          <div className="flex justify-center space-x-4 mb-6">
             <button
               onClick={() => setIsSignUp(true)}
-              className={`px-4 py-2 rounded ${isSignUp ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+              className={`px-6 py-2 rounded-lg font-medium ${
+                isSignUp
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-200 hover:bg-gray-300 transition'
+              }`}
             >
               Sign Up
             </button>
             <button
               onClick={() => setIsSignUp(false)}
-              className={`px-4 py-2 rounded ${!isSignUp ? 'bg-blue-500 text-white' : 'bg-gray-200'}`}
+              className={`px-6 py-2 rounded-lg font-medium ${
+                !isSignUp
+                  ? 'bg-blue-600 text-white'
+                  : 'bg-gray-200 hover:bg-gray-300 transition'
+              }`}
             >
               Sign In
             </button>
           </div>
 
           {isSignUp ? <SignUpForm /> : <LoginForm />}
-          
+
+          {/* Social Media Sign In */}
           <div className="space-y-4">
             <button
-              onClick={() => signIn("google", { callbackUrl: '/profile' })}
-              className="w-full py-2 px-4 bg-[#4285F4] text-white rounded hover:bg-[#357ABD] transition-colors"
+              onClick={() => signIn('google', { callbackUrl: '/profile' })}
+              className="w-full py-2 px-4 bg-[#4285F4] text-white rounded-lg hover:bg-[#357ABD] transition duration-200"
             >
-              Sign in with Google
+              Continue with Google
             </button>
-
             <button
-              onClick={() => signIn("github", { callbackUrl: '/profile' })}
-              className="w-full py-2 px-4 bg-[#333] text-white rounded hover:bg-[#222] transition-colors"
+              onClick={() => signIn('github', { callbackUrl: '/profile' })}
+              className="w-full py-2 px-4 bg-gray-800 text-white rounded-lg hover:bg-gray-900 transition duration-200"
             >
-              Sign in with Github
+              Continue with GitHub
             </button>
-
             <button
-              onClick={() => signIn("discord", { callbackUrl: '/profile' })}
-              className="w-full py-2 px-4 bg-[#7289DA] text-white rounded hover:bg-[#677BC4] transition-colors"
+              onClick={() => signIn('discord', { callbackUrl: '/profile' })}
+              className="w-full py-2 px-4 bg-[#7289DA] text-white rounded-lg hover:bg-[#677BC4] transition duration-200"
             >
-              Sign in with Discord
+              Continue with Discord
             </button>
           </div>
 
-          {/* Use isColumnOpen to conditionally render content */}
+          {/* Optional Column Content */}
           {isColumnOpen && (
-            <div className="mt-4 p-4 bg-gray-200 rounded">
-              <p>Column is open!</p>
+            <div className="mt-4 p-4 bg-gray-200 rounded-lg shadow-inner">
+              <p className="text-sm">Additional column content is visible!</p>
             </div>
           )}
         </div>
