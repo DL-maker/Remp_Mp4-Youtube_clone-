@@ -35,8 +35,18 @@ function generateRandomName() {
   return `${firstName} ${lastName}`;
 }
 
+interface Video {
+  src: string;
+  title: string;
+  key: string;
+  likes: number;
+  isLiked: boolean;
+  isDisliked: boolean;
+  isSubscribed: boolean;
+}
+
 const ShortPage = () => {
-  const [videos, setVideos] = useState<Array<any>>([]);
+  const [videos, setVideos] = useState<Array<Video>>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isMuted, setIsMuted] = useState(true);
   const [isPlaying, setIsPlaying] = useState(true);
