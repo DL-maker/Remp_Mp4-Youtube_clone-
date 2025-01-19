@@ -25,7 +25,12 @@ async function fetchShortVideoList() {
 const ShortPage = () => {
   const [videos, setVideos] = useState<Array<{ src: string; title: string; key: string }>>([]);
   const [currentIndex, setCurrentIndex] = useState(0);
+  const [isOpen, setIsOpen] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
+
+  const toggleColumn = () => {
+    setIsOpen(!isOpen);
+  };
 
   useEffect(() => {
     const loadVideos = async () => {
@@ -53,7 +58,7 @@ const ShortPage = () => {
 
   return (
     <div className="min-h-screen flex flex-col bg-brown-200">
-      <Navbar toggleColumn={() => {}} />
+      <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
       <div className="flex-1 flex flex-col items-center justify-center">
         {videos.length > 0 && (
           <div className="relative w-full h-full flex flex-col items-center">
