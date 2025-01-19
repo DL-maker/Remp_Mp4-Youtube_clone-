@@ -3,9 +3,11 @@
 import React, { useState } from 'react';
 import Navbar from "@/components/navbar";
 import Image from 'next/image';
+import { useRouter } from 'next/navigation'; // Updated import
 
 export default function Publicite() {
   const [isOpen, setIsOpen] = useState(false);
+  const router = useRouter(); // Using the new app router
 
   const toggleColumn = () => {
     setIsOpen(!isOpen);
@@ -16,9 +18,9 @@ export default function Publicite() {
       <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
 
       {/* Section Principale */}
-      <section className="relative bg-blue-600 text-white py-20">
-        <div className="max-w-6xl mx-auto px-4">
-          <div className="md:w-3/5">
+      <section className="relative text-white py-20 bg-cover bg-center" style={{ backgroundImage: "url('/Advertising.png')" }}>
+        <div className="max-w-6xl mx-auto px-4 relative z-10">
+          <div className="md:w-3/5 bg-black bg-opacity-50 p-6 rounded-lg">
             <h1 className="text-4xl md:text-5xl font-bold mb-6">
               Boostez votre entreprise grâce à la publicité Remp Mp4
             </h1>
@@ -26,23 +28,11 @@ export default function Publicite() {
               Attirez de nouveaux spectateurs et développez votre clientèle en maximisant votre portée.
             </p>
             <div className="flex flex-wrap gap-4">
-              <button className="bg-white text-blue-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition">
+              <button className="bg-white text-blue-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition" onClick={() => router.push('/login')}>
                 Commencez maintenant
-              </button>
-              <button className="bg-transparent border-2 border-white px-6 py-3 rounded-full font-semibold hover:bg-white hover:text-blue-600 transition">
-                Découvrez-en plus
               </button>
             </div>
           </div>
-        </div>
-        <div className="absolute right-0 bottom-0 hidden md:block">
-          <Image
-            src="/Advertising.png"
-            alt="Publicité Remp Mp4"
-            width={500}
-            height={300}
-            className="rounded-tl-lg"
-          />
         </div>
       </section>
 
@@ -76,19 +66,19 @@ export default function Publicite() {
       </section>
 
       {/* Section Statistiques */}
-      <section className="bg-gray-50 py-20">
+      <section className="bg-gray-200 py-20">
         <div className="max-w-6xl mx-auto px-4">
           <h2 className="text-3xl font-bold text-center mb-12">Chiffres clés</h2>
           <div className="grid md:grid-cols-3 gap-8">
-            <div className="bg-white p-8 rounded-lg shadow-sm text-center">
+            <div className="bg-white p-8 rounded-lg shadow-sm text-center hover:shadow-lg transition-shadow duration-300">
               <div className="text-4xl font-bold text-blue-600 mb-4">2x</div>
               <p className="text-gray-600">Les utilisateurs déclarent être deux fois plus enclins à acheter un produit vu sur Remp Mp4</p>
             </div>
-            <div className="bg-white p-8 rounded-lg shadow-sm text-center">
+            <div className="bg-white p-8 rounded-lg shadow-sm text-center hover:shadow-lg transition-shadow duration-300">
               <div className="text-4xl font-bold text-blue-600 mb-4">70%</div>
               <p className="text-gray-600">39,5 millions d&apos;adultes en France regardent Remp Mp4 chaque mois</p>
             </div>
-            <div className="bg-white p-8 rounded-lg shadow-sm text-center">
+            <div className="bg-white p-8 rounded-lg shadow-sm text-center hover:shadow-lg transition-shadow duration-300">
               <div className="text-4xl font-bold text-blue-600 mb-4">4x</div>
               <p className="text-gray-600">Les utilisateurs sont quatre fois plus susceptibles d&apos;utiliser Remp Mp4 par rapport à d&apos;autres plateformes</p>
             </div>
@@ -114,7 +104,7 @@ export default function Publicite() {
       </section>
 
       {/* Section CTA */}
-      <section className="bg-blue-600 text-white py-16">
+      <section className="bg-slate-500 text-white py-16">
         <div className="max-w-4xl mx-auto px-4 text-center">
           <h2 className="text-3xl font-bold mb-6">
             Les outils essentiels pour créer une publicité efficace
@@ -123,11 +113,8 @@ export default function Publicite() {
             Que vous soyez débutant ou expert, créez facilement des annonces vidéo qui produisent des résultats avec nos outils gratuits ou l&apos;aide de nos partenaires.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <button className="bg-white text-blue-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition">
+            <button className="bg-white text-blue-600 px-6 py-3 rounded-full font-semibold hover:bg-gray-100 transition" onClick={() => router.push('/login')}>
               Lancez-vous
-            </button>
-            <button className="bg-transparent border-2 border-white px-6 py-3 rounded-full font-semibold hover:bg-white hover:text-blue-600 transition">
-              Apprenez-en plus
             </button>
           </div>
         </div>
