@@ -87,7 +87,6 @@ function VideoPageContent() {
   };
 
   return (
-    <Suspense fallback={<div>Loading...</div>}>
       <div className="min-h-screen bg-gray-50">
         <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
         <div className="flex flex-col md:flex-row">
@@ -136,63 +135,8 @@ function VideoPageContent() {
             <p>Don&apos;t miss it!</p>
           </div>
         </div>
-        <div className="mt-8 px-6">
-          <h2 className="text-2xl font-bold text-gray-700 mb-4">S&apos;enregistrer</h2>
-          <div className="flex flex-col md:flex-row items-center gap-4">
-            <input
-              type="text"
-              placeholder="Nom d'utilisateur"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="border p-2 rounded-lg flex-1"
-            />
-            <input
-              type="password"
-              placeholder="Mot de passe"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="border p-2 rounded-lg flex-1"
-            />
-            <button
-              onClick={handleRegister}
-              className="bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600"
-            >
-              S&apos;enregistrer
-            </button>
-          </div>
-        </div>
-        <div className="mt-8 px-6">
-          <h2 className="text-2xl font-bold text-gray-700 mb-4">Se connecter</h2>
-          <div className="flex flex-col md:flex-row items-center gap-4">
-            <input
-              type="text"
-              placeholder="Nom d'utilisateur"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-              className="border p-2 rounded-lg flex-1"
-            />
-            <input
-              type="password"
-              placeholder="Mot de passe"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-              className="border p-2 rounded-lg flex-1"
-            />
-            <button
-              onClick={handleLogin}
-              className="bg-green-500 text-white px-4 py-2 rounded-lg hover:bg-green-600"
-            >
-              Se connecter
-            </button>
-          </div>
-        </div>
-        {sessionNumber && (
-          <div className="mt-4 px-6 text-gray-700">
-            <p>Votre numéro de session : {sessionNumber}</p>
-          </div>
-        )}
       </div>
-    </Suspense>
+    
   );
 }
 
