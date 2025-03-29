@@ -1,59 +1,61 @@
 # Remp-mp4 - Local/Web YouTube Clone with Shorts
 
 ## Description
-Remp-mp4 is a web application that replicates YouTube's core functionalities, including regular videos and shorts. Built with Next.js and Tailwind CSS, the application allows you to manage your videos both locally and through cloud streaming with MUX integration.
 
-## Main Features
-### Video Management
-- Support for two types of content:
-  - Regular videos (standard format)
-  - Shorts (vertical short format)
-- Flexible video hosting options:
-  - Local storage in public directory
-  - Cloud streaming via MUX integration
-- User video uploads
-- Automatic thumbnail system
-- Optimized streaming playback
-- Automatic classification between videos and shorts based on format
+**Remp-mp4** est une application web innovante qui réplique les fonctionnalités principales de YouTube, y compris les vidéos régulières et les shorts. Construite avec Next.js et Tailwind CSS, elle permet de gérer vos vidéos localement et via le streaming cloud grâce à l'intégration de MUX. Vous avez un contrôle total sur qui peut voir vos vidéos en partageant des liens uniquement avec des personnes de confiance.
 
-### Video Hosting Options
-#### Local Storage
-```
-public/
-├── videos/
-│   ├── video1.mp4
-│   ├── video2.mp4
-│   ├── video3.mp4
-│   └── video4.mp4
-│      
-└── shorts/
-    ├── short1.mp4
-    ├── short2.mp4
-    └── short3.mp4
-```
+## Fonctionnalités Principales
 
-#### MUX Cloud Storage
-- Stream-ready video hosting
-- Automatic video optimization
-- Global CDN delivery
-- Real-time video analytics
-- Adaptive bitrate streaming
+### Gestion des Vidéos
+- **Types de Contenu** :
+  - Vidéos régulières (format standard)
+  - Shorts (format vertical court)
+- **Options de Stockage Flexibles** :
+  - Stockage local dans le répertoire public
+  - Streaming cloud via MUX
+- **Téléchargements Utilisateur** :
+  - Téléchargements de vidéos par les utilisateurs
+  - Système automatique de miniatures
+  - Lecture optimisée en streaming
+  - Classification automatique entre vidéos et shorts basée sur le format
 
-### User Interactions
-- Like/dislike system
-- Channel subscription system
-- Comments on videos and shorts
-- TikTok-style vertical navigation for shorts
-- Separate viewing history for videos and shorts
+### Options de Stockage Vidéo
+- **Stockage Local** :
+  ```
+  public/
+  ├── videos/
+  │   ├── video1.mp4
+  │   ├── video2.mp4
+  │   ├── video3.mp4
+  │   └── video4.mp4
+  └── shorts/
+      ├── short1.mp4
+      ├── short2.mp4
+      └── short3.mp4
+  ```
+- **Stockage Cloud MUX** :
+  - Hébergement vidéo prêt pour le streaming
+  - Optimisation automatique des vidéos
+  - Distribution globale via CDN
+  - Analyses vidéo en temps réel
+  - Streaming adaptatif
 
-### User Interface
-- Responsive design with Tailwind CSS
-- Separate navigation for videos and shorts
-- Search bar with filters
-- Dark/light mode
-- YouTube-inspired interface
+### Interactions Utilisateur
+- Système de likes/dislikes
+- Système d'abonnement aux chaînes
+- Commentaires sur les vidéos et shorts
+- Navigation verticale de type TikTok pour les shorts
+- Historique de visionnage séparé pour les vidéos et shorts
 
-## Technologies Used
+### Interface Utilisateur
+- Design réactif avec Tailwind CSS
+- Navigation séparée pour les vidéos et shorts
+- Barre de recherche avec filtres
+- Mode sombre/clair
+- Interface inspirée de YouTube
+
+## Technologies Utilisées
+
 ### Frontend
 - Next.js 14+
 - Tailwind CSS
@@ -64,112 +66,116 @@ public/
 - Next.js API Routes
 - Prisma (ORM)
 - PostgreSQL
-- NextAuth.js (Authentication)
-- MUX SDK for video streaming
+- NextAuth.js (Authentification)
+- MUX SDK pour le streaming vidéo
 
 ## Installation
-```bash
-# Clone the project
+
+```sh
+# Cloner le projet
 git clone https://github.com/DL-maker/Remp_Mp4-Youtube_clone-.git
 
-# Install dependencies
+# Installer les dépendances
 cd Remp_Mp4-Youtube_clone-.git
 npm install
 
-# Configure environment variables
+# Configurer les variables d'environnement
 cp .env.example .env.local
 
-# Add MUX credentials to .env.local
+# Ajouter les identifiants MUX à .env.local
 MUX_TOKEN_ID=your_token_id
 MUX_TOKEN_SECRET=your_token_secret
 
-# Run Prisma migrations
+# Exécuter les migrations Prisma
 npx prisma migrate dev
 
-# Start development server
+# Démarrer le serveur de développement
 npm run dev
 ```
 
-## Environment Variables
-```env
-# Database
+## Variables d'Environnement
+
+```sh
+# Base de données
 DATABASE_URL="postgresql://..."
 
-# Auth
+# Authentification
 NEXTAUTH_SECRET="your-secret"
 NEXTAUTH_URL="http://localhost:3000"
 
-# MUX Configuration
+# Configuration MUX
 MUX_TOKEN_ID="your_token_id"
 MUX_TOKEN_SECRET="your_token_secret"
 ```
 
 ## API Routes
-### Regular Videos
-- `GET /api/videos` - List videos
-- `POST /api/videos` - Upload a video (local or MUX)
-- `GET /api/videos/:id` - Video details
-- `PUT /api/videos/:id` - Update a video
-- `DELETE /api/videos/:id` - Delete a video
 
-### MUX Specific Routes
-- `POST /api/mux/upload` - Initialize MUX upload
-- `GET /api/mux/asset/:id` - Get MUX asset details
-- `DELETE /api/mux/asset/:id` - Delete MUX asset
+### Vidéos Régulières
+- `GET /api/videos` - Lister les vidéos
+- `POST /api/videos` - Télécharger une vidéo (locale ou MUX)
+- `GET /api/videos/:id` - Détails de la vidéo
+- `PUT /api/videos/:id` - Mettre à jour une vidéo
+- `DELETE /api/videos/:id` - Supprimer une vidéo
+
+### Routes Spécifiques MUX
+- `POST /api/mux/upload` - Initialiser le téléchargement MUX
+- `GET /api/mux/asset/:id` - Obtenir les détails de l'asset MUX
+- `DELETE /api/mux/asset/:id` - Supprimer l'asset MUX
 
 ### Shorts
-- `GET /api/shorts` - List shorts
-- `POST /api/shorts` - Upload a short
-- `GET /api/shorts/:id` - Short details
-- `PUT /api/shorts/:id` - Update a short
-- `DELETE /api/shorts/:id` - Delete a short
+- `GET /api/shorts` - Lister les shorts
+- `POST /api/shorts` - Télécharger un short
+- `GET /api/shorts/:id` - Détails du short
+- `PUT /api/shorts/:id` - Mettre à jour un short
+- `DELETE /api/shorts/:id` - Supprimer un short
 
-### Users
-- `GET /api/users/:id` - User profile
-- `POST /api/users/subscribe` - Subscribe to a channel
-- `POST /api/users/unsubscribe` - Unsubscribe from a channel
+### Utilisateurs
+- `GET /api/users/:id` - Profil utilisateur
+- `POST /api/users/subscribe` - S'abonner à une chaîne
+- `POST /api/users/unsubscribe` - Se désabonner d'une chaîne
 
 ### Interactions
-- `POST /api/videos/:id/like` - Like a video/short
-- `POST /api/videos/:id/dislike` - Dislike a video/short
-- `POST /api/videos/:id/comments` - Comment on a video/short
+- `POST /api/videos/:id/like` - Aimer une vidéo/short
+- `POST /api/videos/:id/dislike` - Ne pas aimer une vidéo/short
+- `POST /api/videos/:id/comments` - Commenter une vidéo/short
 
-## Video Validation
-### Regular Videos
-- Format: MP4, WEBP
-- Maximum resolution: 4K (3840x2160)
+## Validation Vidéo
+
+### Vidéos Régulières
+- Format : MP4, WEBP
+- Résolution maximale : 4K (3840x2160)
 
 ### Shorts
-- Format: MP4, WEBP
-- Resolution: Vertical format (9:16)
+- Format : MP4, WEBP
+- Résolution : Format vertical (9:16)
 
-### MUX Uploads
-- Supports all major video formats
-- Automatic transcoding
-- Adaptive streaming formats
+### Téléchargements MUX
+- Supporte tous les principaux formats vidéo
+- Transcodage automatique
+- Formats de streaming adaptatif
 
-## Security
-- User authentication via NextAuth.js
-- Uploaded file validation
-- CSRF protection
-- API rate limiting
-- User input sanitization
-- Secure MUX credentials handling
+## Sécurité
+- Authentification utilisateur via NextAuth.js
+- Validation des fichiers téléchargés
+- Protection CSRF
+- Limitation de taux des API
+- Sanitisation des entrées utilisateur
+- Gestion sécurisée des identifiants MUX
 
 ## Performance
-- Video caching
-- Component lazy loading
-- Image optimization
-- Video streaming (local and MUX)
-- Asset compression
-- Global CDN delivery via MUX
+- Mise en cache des vidéos
+- Chargement paresseux des composants
+- Optimisation des images
+- Streaming vidéo (local et MUX)
+- Compression des assets
+- Distribution globale via CDN MUX
 
-## Contributing
-1. Fork the project
-2. Create your feature branch (`git checkout -b feature/AmazingFeature`)
-3. Commit your changes (`git commit -m 'Add some AmazingFeature'`)
-4. Push to the branch (`git push origin feature/AmazingFeature`)
-5. Open a Pull Request
+## Contribution
+1. Forkez le projet
+2. Créez votre branche de fonctionnalité (`git checkout -b feature/AmazingFeature`)
+3. Commitez vos modifications (`git commit -m 'Add some AmazingFeature'`)
+4. Poussez vers la branche (`git push origin feature/AmazingFeature`)
+5. Ouvrez une Pull Request
 
-## License
-This project is licensed under the MIT License.
+## Licence
+Ce projet est sous licence MIT.
