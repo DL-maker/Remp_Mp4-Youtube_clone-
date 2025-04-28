@@ -1,10 +1,17 @@
-# Remp-mp4 - Local/Web YouTube Clone with Shorts
+# Remp-mp4 - Clone YouTube avec partage sécurisé
 
 ## Description
 
-**Remp-mp4** est une application web innovante qui réplique les fonctionnalités principales de YouTube, y compris les vidéos régulières et les shorts. Construite avec Next.js et Tailwind CSS, elle permet de gérer vos vidéos localement et via le streaming cloud grâce à l'intégration de MUX. Vous avez un contrôle total sur qui peut voir vos vidéos en partageant des liens uniquement avec des personnes de confiance.
+**Remp-mp4** est une plateforme innovante qui réplique les fonctionnalités principales de YouTube, y compris les vidéos régulières et les shorts. Construite avec Next.js et Tailwind CSS, elle vous permet de gérer et partager vos vidéos de manière sécurisée et contrôlée, en donnant accès uniquement aux personnes de votre choix via des liens uniques générés pour chaque contenu.
 
 ## Fonctionnalités Principales
+
+### Partage de Contenu Contrôlé
+- **Génération de liens uniques** pour chaque vidéo partagée
+- **Contrôle d'accès précis** : partagez uniquement avec les personnes de confiance
+- **Options d'expiration** pour les contenus sensibles
+- **Protection par mot de passe** optionnelle
+- **Statistiques de visualisation** pour suivre qui accède à vos vidéos
 
 ### Gestion des Vidéos
 - **Types de Contenu** :
@@ -14,31 +21,28 @@
   - Stockage local dans le répertoire public
   - Streaming cloud via MUX
 - **Téléchargements Utilisateur** :
-  - Téléchargements de vidéos par les utilisateurs
   - Système automatique de miniatures
   - Lecture optimisée en streaming
   - Classification automatique entre vidéos et shorts basée sur le format
 
-### Options de Stockage Vidéo
-- **Stockage Local** :
-  ```
-  public/
-  ├── videos/
-  │   ├── video1.mp4
-  │   ├── video2.mp4
-  │   ├── video3.mp4
-  │   └── video4.mp4
-  └── shorts/
-      ├── short1.mp4
-      ├── short2.mp4
-      └── short3.mp4
-  ```
-- **Stockage Cloud MUX** :
-  - Hébergement vidéo prêt pour le streaming
-  - Optimisation automatique des vidéos
-  - Distribution globale via CDN
-  - Analyses vidéo en temps réel
-  - Streaming adaptatif
+### Structure de Stockage
+```
+public/
+├── videos/
+│   ├── video1.mp4
+│   ├── video2.mp4
+│   └── video3.mp4
+└── shorts/
+    ├── short1.mp4
+    ├── short2.mp4
+    └── short3.mp4
+```
+
+### Formats Vidéo Supportés
+- Format : MP4, WEBP
+- Résolution maximale pour vidéos régulières : 4K (3840x2160)
+- Format pour shorts : Vertical (9:16)
+- Streaming adaptatif via MUX
 
 ### Interactions Utilisateur
 - Système de likes/dislikes
@@ -76,7 +80,7 @@
 git clone https://github.com/DL-maker/Remp_Mp4-Youtube_clone-.git
 
 # Installer les dépendances
-cd Remp_Mp4-Youtube_clone-.git
+cd Remp_Mp4-Youtube_clone-
 npm install
 
 # Configurer les variables d'environnement
@@ -106,7 +110,18 @@ NEXTAUTH_URL="http://localhost:3000"
 # Configuration MUX
 MUX_TOKEN_ID="your_token_id"
 MUX_TOKEN_SECRET="your_token_secret"
+
+# Configuration des liens de partage
+SHARE_BASE_URL="https://votre-domaine.com"
 ```
+
+## Configuration du Partage
+
+Dans les paramètres de votre compte, vous pouvez:
+- **Activer/désactiver le partage**: Permet de générer des liens uniques pour partager votre contenu
+- **Configurer l'URL de partage**: Spécifiez l'URL de base qui sera utilisée pour créer vos liens de partage
+- **Définir des expirations**: Configurez la durée de validité de vos liens partagés
+- **Ajouter des protections**: Options pour sécuriser davantage vos vidéos partagées
 
 ## API Routes
 
@@ -116,6 +131,7 @@ MUX_TOKEN_SECRET="your_token_secret"
 - `GET /api/videos/:id` - Détails de la vidéo
 - `PUT /api/videos/:id` - Mettre à jour une vidéo
 - `DELETE /api/videos/:id` - Supprimer une vidéo
+- `POST /api/videos/:id/share` - Générer un lien de partage pour une vidéo
 
 ### Routes Spécifiques MUX
 - `POST /api/mux/upload` - Initialiser le téléchargement MUX
@@ -128,16 +144,18 @@ MUX_TOKEN_SECRET="your_token_secret"
 - `GET /api/shorts/:id` - Détails du short
 - `PUT /api/shorts/:id` - Mettre à jour un short
 - `DELETE /api/shorts/:id` - Supprimer un short
+- `POST /api/shorts/:id/share` - Générer un lien de partage pour un short
 
 ### Utilisateurs
 - `GET /api/users/:id` - Profil utilisateur
 - `POST /api/users/subscribe` - S'abonner à une chaîne
 - `POST /api/users/unsubscribe` - Se désabonner d'une chaîne
 
-### Interactions
-- `POST /api/videos/:id/like` - Aimer une vidéo/short
-- `POST /api/videos/:id/dislike` - Ne pas aimer une vidéo/short
-- `POST /api/videos/:id/comments` - Commenter une vidéo/short
+### Partage et Accès
+- `POST /api/share/create` - Créer un lien de partage
+- `GET /api/share/verify/:token` - Vérifier un lien de partage
+- `PUT /api/share/:id/expire` - Configurer l'expiration d'un partage
+- `GET /api/share/stats/:id` - Obtenir les statistiques de visualisation
 
 ## Validation Vidéo
 
@@ -156,6 +174,7 @@ MUX_TOKEN_SECRET="your_token_secret"
 
 ## Sécurité
 - Authentification utilisateur via NextAuth.js
+- Liens de partage cryptés et à durée limitée
 - Validation des fichiers téléchargés
 - Protection CSRF
 - Limitation de taux des API
@@ -165,10 +184,20 @@ MUX_TOKEN_SECRET="your_token_secret"
 ## Performance
 - Mise en cache des vidéos
 - Chargement paresseux des composants
-- Optimisation des images
+- Optimisation des images et miniatures
 - Streaming vidéo (local et MUX)
 - Compression des assets
 - Distribution globale via CDN MUX
+
+## Guide d'utilisation du partage
+
+1. Connectez-vous à votre compte
+2. Activez l'option "Partage" dans les paramètres du compte
+3. Ajoutez l'URL de base pour vos liens de partage
+4. Téléchargez votre vidéo
+5. Utilisez le bouton "Partager" sur n'importe quelle vidéo
+6. Copiez le lien généré et partagez-le uniquement avec les personnes désirées
+7. Suivez les statistiques de visualisation dans votre tableau de bord
 
 ## Contribution
 1. Forkez le projet
