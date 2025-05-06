@@ -1,125 +1,117 @@
 'use client';
-import { useState, FormEvent } from "react";
-import { signup } from './actions';
 
-// Définition des types
+import { useState } from 'react';
 
-export interface SignupState {
-  error?: Record<string, string[]>;
+interface SignUpState {
+  error?: string;
   success?: boolean;
-  user?: {
-    id: string;
-    username: string;
-    email: string;
-  };
-}
-
-interface SignupFormData {
-  username: string;
-  email: string;
-  password: string;
-}
-
-// Wrapper pour l'action signup
-const signupAction = async (formData: SignupFormData): Promise<SignupState> => {
-  try {
-    const result = await signup(formData as unknown as FormData, window.location.origin);
-    if ('error' in result) {
-      return {
-        success: false,
-        error: result.error
-      };
-    }
-    // Redirection vers le profil après l'inscription
-    window.location.href = '/profile';
-    return {
-      success: result.success,
-      error: {}
-    };
-  } catch (e) {
-    console.error('Signup error:', e);
-    return {
-      error: {
-        username: ['Une erreur est survenue'],
-      }
-    };
-  }
-};
-
-function SubmitButton({ pending }: { pending: boolean }) {
-  return (
-    <button
-      type="submit"
-      disabled={pending}
-      className="bg-blue-500 text-white px-4 py-2 rounded hover:bg-blue-600"
-    >
-      {pending ? 'Submitting...' : 'Sign Up'}
-    </button>
-  );
 }
 
 export function SignUpForm() {
-  const initialState: SignupState = { error: {} };
-  const [state, setState] = useState<SignupState>(initialState);
-  const [pending, setPending] = useState<boolean>(false);
+  const [username, setUsername] = useState('');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [state, setState] = useState<SignUpState>({});
 
-  const handleSubmit: HandleSubmit = async (event) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
-    setPending(true);
-    const formData = new FormData(event.currentTarget);
-    const result = await signupAction({
-      username: formData.get('username') as string,
-      email: formData.get('email') as string,
-      password: formData.get('password') as string,
-    });
-    setState(result);
-    setPending(false);
+    setState({}); // Reset previous states
+    
+    try {
+      // Créer correctement un objet FormData à partir du formulaire
+      const formData = new FormData(event.currentTarget);
+      
+      const response = await fetch('/api/auth/signup', {
+        method: 'POST',
+        // Pas besoin de spécifier Content-Type pour FormData,
+        // le navigateur le définit automatiquement avec la boundary
+        body: formData
+      });
+      
+      // Check if the response is ok before parsing
+      if (!response.ok) {
+        // Try to parse the error message from the response
+        try {
+          const errorData = await response.json();
+          setState({ error: errorData.error || 'Failed to sign up' });
+        } catch (parseError) {
+          // If parsing fails, provide a generic error message
+          setState({ error: 'Failed to sign up' });
+        }
+        return;
+      }
+      
+      // Parse the response data
+      const data = await response.json();
+      
+      // Check if data is defined before accessing its properties
+      if (data && data.message === 'User created successfully') {
+        setState({ success: true });
+      } else {
+        setState({ error: data?.error || 'Failed to sign up' });
+      }
+      
+      // Optionnel: rediriger ou afficher un message de succès
+    } catch (error: any) {
+      console.error('Signup error:', error);
+      setState({ error: error.message || 'An unexpected error occurred' });
+    }
   };
 
   return (
-    <div className="w-full max-w-md">
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <input
-            name="username"
-            type="text"
-            placeholder="Username"
-            className="w-full p-2 border rounded"
-          />
-          {state?.error?.username && (
-            <span className="text-red-500 text-sm">{state.error.username[0]}</span>
-          )}
+    <div className="w-full max-w-md bg-white p-6 rounded-lg shadow-md">
+      {state.success ? (
+        <div className="text-green-600 text-sm p-2 bg-green-100 rounded mb-4">
+          Account created successfully! You can now sign in.
         </div>
-
-        <div>
-          <input
-            name="email"
-            type="email"
-            placeholder="Email"
-            className="w-full p-2 border rounded"
-          />
-          {state?.error?.email && (
-            <span className="text-red-500 text-sm">{state.error.email[0]}</span>
+      ) : (
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <input
+              name="username"
+              type="text"
+              placeholder="Username"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <input
+              name="email"
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              required
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          <div>
+            <input
+              name="password"
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              required
+              className="w-full p-3 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+            />
+          </div>
+          {state.error && (
+            <div className="text-red-600 text-sm p-2 bg-red-100 rounded">
+              {state.error}
+            </div>
           )}
-        </div>
-
-        <div>
-          <input
-            name="password"
-            type="password"
-            placeholder="Password"
-            className="w-full p-2 border rounded"
-          />
-          {state?.error?.password && (
-            <span className="text-red-500 text-sm">{state.error.password[0]}</span>
-          )}
-        </div>
-
-        <SubmitButton pending={pending} />
-      </form>
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white px-4 py-2 rounded-lg hover:bg-blue-700 transition duration-200"
+          >
+            Create Account
+          </button>
+        </form>
+      )}
     </div>
   );
 }
-
-// Define function types
-type HandleSubmit = (e: FormEvent<HTMLFormElement>) => Promise<void>;

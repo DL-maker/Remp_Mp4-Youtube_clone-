@@ -1,4 +1,5 @@
 'use client';
+
 import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/navbar';
@@ -18,10 +19,14 @@ interface ProfileState {
 }
 
 export default function ProfilePage() {
-  const router = useRouter();   
+  const router = useRouter();
   const [state, setState] = useState<ProfileState>({});
   const [isEditing, setIsEditing] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [selectedFile, setSelectedFile] = useState<File | null>(null);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadSuccess, setUploadSuccess] = useState<boolean>(false);
 
   const toggleColumn = () => {
     setIsOpen(!isOpen);
@@ -45,13 +50,76 @@ export default function ProfilePage() {
           username: result.username,
           email: result.email,
           createdAt: result.createdAt,
-          stats: { Video: 0, likes: 0, Abonner: 0 }
+          stats: { Video: 0, likes: 0, Abonner: 0 },
         });
       }
     };
 
     fetchProfile();
   }, [router]);
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    if (event.target.files && event.target.files.length > 0) {
+      setSelectedFile(event.target.files[0]);
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!selectedFile) {
+      setUploadError('Veuillez sélectionner un fichier vidéo.');
+      return;
+    }
+
+    setUploadProgress(0);
+    setUploadError(null);
+    setUploadSuccess(false);
+
+    const formData = new FormData();
+    formData.append('video', selectedFile);
+
+    return new Promise((resolve, reject) => {
+      const xhr = new XMLHttpRequest();
+      xhr.open('POST', '/api/upload-video');
+
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const progress = Math.round((event.loaded * 100) / event.total);
+          setUploadProgress(progress);
+        }
+      };
+
+      xhr.onload = () => {
+        if (xhr.status >= 200 && xhr.status < 300) {
+          try {
+            const data = JSON.parse(xhr.responseText);
+            setUploadSuccess(true);
+            console.log('Upload réussi:', data);
+            resolve(data);
+          } catch (error) {
+            setUploadError('Erreur lors de la lecture de la réponse du serveur.');
+            reject(error);
+          }
+        } else {
+          try {
+            const errorData = JSON.parse(xhr.responseText);
+            setUploadError(errorData?.error || 'Erreur lors de l\'upload.');
+            console.error('Erreur d\'upload:', errorData);
+            reject(errorData);
+          } catch (error) {
+            setUploadError('Erreur lors de la lecture de la réponse d\'erreur du serveur.');
+            reject(error);
+          }
+        }
+      };
+
+      xhr.onerror = () => {
+        setUploadError('Erreur réseau lors de l\'upload.');
+        reject(new Error('Network error during upload.'));
+      };
+
+      xhr.send(formData);
+    });
+  };
 
   if (state.error) {
     return (
@@ -65,86 +133,43 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
-      
+
       <div className="py-8">
         <div className="max-w-4xl mx-auto px-4">
           {!state.userId ? (
             <div className="text-gray-500 text-center">Loading profile...</div>
           ) : (
             <>
-              <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
-                <div className="flex items-center gap-6">
-                  <div className="w-32 h-32 bg-gray-200 rounded-full overflow-hidden">
-                    <Image
-                      src="https://thispersondoesnotexist.com"
-                      alt="Profile"
-                      width={128}
-                      height={128}
-                      className="w-full h-full object-cover"
+              {/* ... le reste de ton code de profil ... */}
+              <div className="bg-white rounded-lg shadow-lg p-6 mt-8">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Uploader une Vidéo</h2>
+                <div className="space-y-4">
+                  <div>
+                    <label htmlFor="video-upload" className="block text-sm font-medium text-gray-700 mb-1">
+                      Sélectionner un fichier vidéo
+                    </label>
+                    <input
+                      id="video-upload"
+                      type="file"
+                      accept="video/*"
+                      onChange={handleFileChange}
+                      className="w-full p-2 border rounded-lg"
                     />
                   </div>
-                  <div className="flex-1">
-                    <div className="flex justify-between items-center mb-4">
-                      <h1 className="text-2xl font-bold text-gray-900">{state.username}</h1>
-                      <button
-                        onClick={() => setIsEditing(!isEditing)}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
-                      >
-                        {isEditing ? 'Close' : 'Edit Profile'}
-                      </button>
-                    </div>
-                    <p className="text-gray-600 mb-2">{state.email}</p>
-                    <p className="text-sm text-gray-500">
-                      Joined {new Date(state.createdAt!).toLocaleDateString()}
-                    </p>
-                  </div>
-                </div>
+                  <button
+                    onClick={handleUpload}
+                    disabled={!selectedFile}
+                    className="px-4 py-2 bg-green-500 text-white rounded-lg hover:bg-green-600 transition disabled:bg-gray-300 disabled:cursor-not-allowed"
+                  >
+                    Uploader la Vidéo
+                  </button>
 
-                <div className="grid grid-cols-3 gap-4 mt-8">
-                  <div className="bg-gray-50 p-4 rounded-lg text-center">
-                    <div className="text-xl font-bold text-gray-900">0</div>
-                    <div className="text-gray-600">Video</div>
-                  </div>
-                  <div className="bg-gray-50 p-4 rounded-lg text-center">
-                    <div className="text-xl font-bold text-gray-900">0</div>
-                    <div className="text-gray-600">Likes</div>
-                  </div>
-                  <div className="bg-gray-50 p-4 rounded-lg text-center">
-                    <div className="text-xl font-bold text-gray-900">0</div>
-                    <div className="text-gray-600">Abonner</div>
-                  </div>
+                  {uploadProgress > 0 && <p>Progression de l'upload: {uploadProgress}%</p>}
+                  {uploadError && <p className="text-red-500">Erreur: {uploadError}</p>}
+                  {uploadSuccess && <p className="text-green-500">Upload réussi!</p>}
                 </div>
               </div>
-
-              {isEditing && (
-                <div className="bg-white rounded-lg shadow-lg p-6">
-                  <h2 className="text-xl font-bold text-gray-900 mb-4">Profile Settings</h2>
-                  <div className="space-y-4">
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Username
-                      </label>
-                      <input
-                        type="text"
-                        className="w-full p-2 border rounded-lg"
-                        value={state.username}
-                        readOnly
-                      />
-                    </div>
-                    <div>
-                      <label className="block text-sm font-medium text-gray-700 mb-1">
-                        Email
-                      </label>
-                      <input
-                        type="email"
-                        className="w-full p-2 border rounded-lg"
-                        value={state.email}
-                        readOnly
-                      />
-                    </div>
-                  </div>
-                </div>
-              )}
+              {/* ... le reste de ton code de profil ... */}
             </>
           )}
         </div>

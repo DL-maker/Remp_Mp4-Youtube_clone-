@@ -1,45 +1,47 @@
-import NextAuth from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-import type { AuthOptions } from "next-auth";
-import type { NextRequest } from "next/server";
+import { NextResponse } from 'next/server';
+import { supabase } from '@/lib/supabaseClient';
+import bcrypt from 'bcrypt';
 
-const authOptions: AuthOptions = {
-  providers: [
-    CredentialsProvider({
-      name: "Credentials",
-      credentials: {
-        username: { label: "Username", type: "text" },
-        password: { label: "Password", type: "password" }
-      },
-      async authorize(credentials) {
-        const user = {
-          id: 1,  // Assuming this is a number from your database
-          username: "test",
-          email: "test@example.com"
-        };
+export async function POST(request: Request) {
+  try {
+    const { email, password } = await request.json();
 
-        if (credentials?.username === "test" && credentials?.password === "test") {
-          return {
-            id: user.id.toString(),  // Convert id to string
-            name: user.username,
-            email: user.email
-          };
-        }
-        return null;
-      }
-    })
-  ],
-  pages: {
-    signIn: "/auth/signin",
+    // Vérifier si l'utilisateur existe
+    const { data: user, error: userError } = await supabase
+      .from('users')
+      .select('*')
+      .eq('email', email)
+      .single();
+
+    if (userError || !user) {
+      return NextResponse.json({ error: 'User not found' }, { status: 404 });
+    }
+
+    // Vérifier le mot de passe
+    const isPasswordValid = await bcrypt.compare(password, user.passwordHash);
+    if (!isPasswordValid) {
+      return NextResponse.json({ error: 'Invalid password' }, { status: 401 });
+    }
+
+    // Créer une session utilisateur
+    const { data: session, error: sessionError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    if (sessionError) {
+      return NextResponse.json({ error: sessionError.message }, { status: 400 });
+    }
+
+    return NextResponse.json({
+      message: 'Login successful',
+      session,
+    });
+  } catch (error: any) {
+    console.error('Login error:', error);
+    return NextResponse.json(
+      { error: error.message || 'An error occurred during login' },
+      { status: 500 }
+    );
   }
-};
-
-const handler = NextAuth(authOptions);
-
-export async function GET(request: NextRequest) {
-  return handler(request);
-}
-
-export async function POST(request: NextRequest) {
-  return handler(request);
 }
