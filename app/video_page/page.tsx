@@ -15,7 +15,7 @@ async function fetchVideoList() {
     const videoFiles = await response.json();
     return videoFiles.map((name: string) => ({
       src: `/videos/${name}`,
-      title: name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+      title: name.replace(/_/g, " " ).replace(/\b\w/g, (c) => c.toUpperCase()),
       key: name,
     }));
   } catch (error) {

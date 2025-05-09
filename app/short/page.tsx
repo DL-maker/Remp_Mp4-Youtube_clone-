@@ -27,7 +27,13 @@ async function fetchShortVideoList() {
   }
 }
 
-function generateRandomName() {
+function generateRandomName(videoSource: string = '') {
+  // Si la vidéo provient du dossier /shorts/ local, c'est une vidéo locale
+  if (videoSource.startsWith('/shorts/') || !videoSource.includes('amazonaws.com')) {
+    return 'No account - local storage';
+  }
+  
+  // Sinon, c'est une vidéo AWS, générer un nom aléatoire
   const firstNames = ["Alice", "Bob", "Charlie", "Diana", "Eve", "Frank"];
   const lastNames = ["Smith", "Johnson", "Brown", "Taylor", "Anderson", "Lee"];
   const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
@@ -372,7 +378,7 @@ const ShortPage = () => {
                 height={40}
               />
               <span className="text-white text-sm bg-black bg-opacity-50 px-2 py-1 rounded">
-                {generateRandomName()}
+                {generateRandomName(videos[currentIndex]?.src)}
               </span>
             </div>
 

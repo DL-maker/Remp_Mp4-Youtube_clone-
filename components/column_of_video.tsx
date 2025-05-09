@@ -6,8 +6,14 @@ import Image from "next/image";
 
 const VIDEO_LOAD_LIMIT = 10; // Limite du nombre de vidéos chargées à chaque fois
 
-// Fonction pour générer un nom aléatoire
-function generateRandomName() {
+// Fonction pour générer un nom d'utilisateur basé sur la source de la vidéo
+function generateRandomName(videoSource: string = '') {
+  // Si la vidéo provient du dossier /videos/ local, c'est une vidéo locale
+  if (videoSource.startsWith('/videos/') || !videoSource.includes('amazonaws.com')) {
+    return 'No account - local storage';
+  }
+  
+  // Sinon, c'est une vidéo AWS, générer un nom aléatoire
   const firstNames = ["Alice", "Bob", "Charlie", "Diana", "Eve", "Frank"];
   const lastNames = ["Smith", "Johnson", "Brown", "Taylor", "Anderson", "Lee"];
   const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
@@ -22,12 +28,28 @@ async function fetchVideoList(startIndex: number, limit: number) {
     if (!response.ok) {
       throw new Error(`Erreur HTTP: ${response.status}`);
     }
+    
+    // Les données retournées sont maintenant des objets plus complexes
     const videoFiles = await response.json();
-    return videoFiles.map((name: string) => ({
-      src: `/videos/${name}`,
-      title: name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
-      key: name, // Utilisation du nom du fichier comme clé unique
-    }));
+    
+    return videoFiles.map((video: any) => {
+      // Vérifier si video est un objet avec une propriété filename ou un simple string
+      const name = typeof video === 'string' ? video : (video.filename || '');
+      const src = typeof video === 'string' 
+        ? `/videos/${video}` 
+        : (video.url || `/videos/${video.filename || ''}`);
+      
+      // S'assurer que name est bien une chaîne avant d'appliquer replace
+      const title = typeof name === 'string'
+        ? name.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase())
+        : 'Vidéo sans titre';
+      
+      return {
+        src,
+        title,
+        key: typeof video === 'string' ? video : (video.id || video.filename || Date.now().toString()),
+      };
+    });
   } catch (error) {
     console.error("Erreur lors de la récupération des vidéos:", error);
     throw error;
@@ -125,7 +147,7 @@ const ColumnOfVideo = () => {
                 height={40}
                 className="rounded-full h-10 w-10 object-cover cursor-pointer"
               />
-              <span className="text-sm font-medium">{generateRandomName()}</span>
+              <span className="text-sm font-medium">{generateRandomName(video.src)}</span>
             </div>
           </div>
         ))}

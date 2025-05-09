@@ -1,5 +1,7 @@
-"use client";
+'use client';
 import React, { useState, useEffect } from "react";
+import { useRouter } from 'next/navigation'; // Importe le routeur
+
 import {
   LineChart,
   Line,
@@ -26,92 +28,60 @@ const VosVideosPage = () => {
   const [isOpen, setIsOpen] = useState(false);
   const [data, setData] = useState(generateRandomData());
   const [videos, setVideos] = useState<
-    Array<{ id: number; date: string; type: string; url: string }>
+    Array<{ id: number; filename: string; date: string; type: string; url: string; size?: number }>
   >([]);
-  const [videoFile, setVideoFile] = useState<File | null>(null);
-  const [videoType, setVideoType] = useState("normale");
-  const [isUploading, setIsUploading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(true);
+  const router = useRouter(); // Initialise le routeur
 
   const toggleColumn = () => {
     setIsOpen(!isOpen);
   };
 
   useEffect(() => {
-    const fetchVideos = async () => {
+    const checkSessionAndFetchVideos = async () => {
+      const sessionResponse = await fetch('/api/session');
+      if (sessionResponse.status === 401) {
+        router.push('/login'); // Redirige vers la page de login si la session n'est pas valide
+        return;
+      } else if (!sessionResponse.ok) {
+        setError('Erreur lors de la vérification de la session.');
+        setLoading(false);
+        return;
+      }
+
+      // La session est valide, on peut charger les vidéos de l'utilisateur
       try {
-        const response = await fetch("/api/videos");
-        if (!response.ok) {
-          throw new Error(`HTTP error! status: ${response.status}`);
+        const videosResponse = await fetch("/api/list-videos");
+        if (!videosResponse.ok) {
+          const errorData = await videosResponse.json();
+          throw new Error(errorData.error || `Erreur HTTP: ${videosResponse.status}`);
         }
-        const data = await response.json();
-        setVideos(data);
+        const data = await videosResponse.json();
+        
+        // Si nous avons des données, on les affiche
+        if (Array.isArray(data) && data.length > 0) {
+          setVideos(data);
+        } else {
+          // Si pas de vidéos, on affiche un message spécifique
+          setError("Aucune vidéo trouvée. Uploadez votre première vidéo!");
+        }
       } catch (err) {
-        setError(err instanceof Error ? err.message : "An unknown error occurred");
+        console.error("Erreur lors du chargement des vidéos:", err);
+        setError(err instanceof Error ? err.message : "Une erreur inconnue s'est produite");
       } finally {
         setLoading(false);
       }
     };
 
-    fetchVideos();
-  }, []);
-
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
-    if (file && file.type.includes("video/")) {
-      setVideoFile(file);
-    }
-  };
-
-  const handlePublish = async () => {
-    if (!videoFile) return;
-
-    setIsUploading(true);
-    const formData = new FormData();
-    formData.append("file", videoFile);
-    formData.append("type", videoType);
-
-    try {
-      const response = await fetch("/api/videos/upload", {
-        method: "POST",
-        body: formData,
-      });
-
-      if (!response.ok) {
-        throw new Error(`Erreur ${response.status}: ${await response.text()}`);
-      }
-
-      const result = await response.json();
-      setVideos((prev) => [
-        ...prev,
-        {
-          id: prev.length + 1,
-          date: new Date().toLocaleDateString(),
-          type: videoType,
-          url: result.url,
-        },
-      ]);
-
-      // Reset
-      setVideoFile(null);
-      setVideoType("normale");
-      setData(generateRandomData());
-      if (document.getElementById("videoInput") instanceof HTMLInputElement) {
-        (document.getElementById("videoInput") as HTMLInputElement).value = "";
-      }
-    } catch (err) {
-      console.error("Erreur lors du téléchargement:", err);
-    } finally {
-      setIsUploading(false);
-    }
-  };
+    checkSessionAndFetchVideos();
+  }, [router]); // Le router dans les dépendances pour réagir aux changements de route
 
   if (loading) {
     return (
       <div>
         <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
-        <div className="text-center text-gray-600">Chargement...</div>
+        <div className="text-center text-gray-600">Chargement de vos vidéos...</div>
       </div>
     );
   }
@@ -128,7 +98,7 @@ const VosVideosPage = () => {
   return (
     <div className=" bg-gray-100 min-h-screen">
       <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
-      <h1 className="text-3xl font-bold text-gray-800 mb-8">Tableau de Bord</h1>
+      <h1 className="text-3xl font-bold text-gray-800 mb-8">Vos Vidéos</h1>
 
       <ResponsiveContainer width="100%" height={400}>
         <LineChart data={data}>
@@ -143,57 +113,6 @@ const VosVideosPage = () => {
           <Line type="monotone" dataKey="dislikes" stroke="#ef4444" />
         </LineChart>
       </ResponsiveContainer>
-
-      <div className="mt-8 space-y-6">
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Importer une vidéo
-          </label>
-          <input
-            id="videoInput"
-            type="file"
-            accept="video/mp4,video/webm"
-            onChange={handleFileChange}
-            className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:rounded-lg file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
-          />
-        </div>
-
-        <div>
-          <label className="block text-sm font-medium text-gray-700 mb-2">
-            Type de vidéo
-          </label>
-          <div className="flex space-x-4">
-            <label className="inline-flex items-center">
-              <input
-          type="radio"
-          value="normale"
-          checked={videoType === "normale"}
-          onChange={(e) => setVideoType(e.target.value)}
-          className="form-radio text-indigo-600"
-              />
-              <span className="ml-2 pl-2">Normale</span>
-            </label>
-            <label className="inline-flex items-center">
-              <input
-          type="radio"
-          value="short"
-          checked={videoType === "short"}
-          onChange={(e) => setVideoType(e.target.value)}
-          className="form-radio text-indigo-600"
-              />
-              <span className="ml-2">Short</span>
-            </label>
-          </div>
-        </div>
-
-        <button
-          onClick={handlePublish}
-          disabled={isUploading || !videoFile}
-          className="px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 disabled:opacity-50"
-        >
-          {isUploading ? "Téléchargement..." : "Publier la vidéo"}
-        </button>
-      </div>
 
       <table className="mt-8 bg-white rounded-lg shadow-md w-full text-left">
         <thead className="bg-gray-100 text-gray-700">
