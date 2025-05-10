@@ -145,7 +145,7 @@ const SettingsPage = () => {
         {/* Switch pour activer/désactiver MUX */}
         <div className="mb-8 flex items-center">
           <label htmlFor="mux" className="text-xl font-medium text-gray-700 mr-4">
-            Activer MUX
+            Activer MUX or a link to another invisible mode
           </label>
           <input
             type="checkbox"

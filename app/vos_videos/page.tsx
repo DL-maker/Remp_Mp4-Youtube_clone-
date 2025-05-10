@@ -52,7 +52,7 @@ const VosVideosPage = () => {
 
       // La session est valide, on peut charger les vidéos de l'utilisateur
       try {
-        const videosResponse = await fetch("/api/list-videos");
+        const videosResponse = await fetch("/api/list-videos?userOnly=true");
         if (!videosResponse.ok) {
           const errorData = await videosResponse.json();
           throw new Error(errorData.error || `Erreur HTTP: ${videosResponse.status}`);
@@ -61,7 +61,13 @@ const VosVideosPage = () => {
         
         // Si nous avons des données, on les affiche
         if (Array.isArray(data) && data.length > 0) {
-          setVideos(data);
+          setVideos(data.map((video, index) => ({
+            id: index + 1,
+            filename: video.title,
+            date: new Date(video.date).toLocaleDateString(),
+            type: video.type,
+            url: video.src
+          })));
         } else {
           // Si pas de vidéos, on affiche un message spécifique
           setError("Aucune vidéo trouvée. Uploadez votre première vidéo!");

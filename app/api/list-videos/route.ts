@@ -23,9 +23,39 @@ export async function GET(request: Request) {
     const url = new URL(request.url);
     const startParam = url.searchParams.get('start');
     const limitParam = url.searchParams.get('limit');
+    const userOnly = url.searchParams.get('userOnly') === 'true';
     
     const start = startParam ? parseInt(startParam, 10) : 0;
     const limit = limitParam ? parseInt(limitParam, 10) : 10;
+
+    let requestingUserId = null;
+    let requestingUsername = null;
+
+    // Si on demande uniquement les vidéos de l'utilisateur, on vérifie la session
+    if (userOnly) {
+      const sessionCookie = (await cookies()).get('session')?.value;
+      if (!sessionCookie) {
+        return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+      }
+
+      const session = await decrypt(sessionCookie);
+      requestingUserId = session?.userId;
+
+      if (!requestingUserId) {
+        return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+      }
+
+      const user = await prisma.user.findUnique({
+        where: { id: requestingUserId },
+        select: { username: true }
+      });
+
+      if (!user) {
+        return NextResponse.json({ error: 'Utilisateur non trouvé' }, { status: 404 });
+      }
+
+      requestingUsername = user.username;
+    }
     
     let allVideos = [];
     
@@ -53,26 +83,34 @@ export async function GET(request: Request) {
           if (pathParts && pathParts.length >= 3) {
             const username = pathParts[1];
 
-            // Vérifier si l'utilisateur est en mode invisible
-            const user = await prisma.user.findUnique({
-              where: { username },
-              select: { isInvisible: true }
-            });
-
-            // Ne pas inclure les vidéos des utilisateurs en mode invisible
-            if (!user?.isInvisible) {
-              allVideos.push({
-                id: `s3-${obj.Key}`,
-                key: obj.Key || '',
-                filename: pathParts[pathParts.length - 1],
-                title: pathParts[pathParts.length - 1].replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase()),
-                date: obj.LastModified?.toISOString() || new Date().toISOString(),
-                type: 'video',
-                src: `/api/video-stream?key=${encodeURIComponent(obj.Key || '')}`,
-                size: obj.Size || 0,
-                username: username
-              });
+            // Si on veut uniquement les vidéos de l'utilisateur, on filtre par son nom d'utilisateur
+            if (userOnly && username !== requestingUsername) {
+              continue;
             }
+
+            // Pour l'affichage public, on vérifie si l'utilisateur est en mode invisible
+            if (!userOnly) {
+              const user = await prisma.user.findUnique({
+                where: { username },
+                select: { isInvisible: true }
+              });
+
+              if (user?.isInvisible) {
+                continue;
+              }
+            }
+
+            allVideos.push({
+              id: `s3-${obj.Key}`,
+              key: obj.Key || '',
+              filename: pathParts[pathParts.length - 1],
+              title: pathParts[pathParts.length - 1].replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase()),
+              date: obj.LastModified?.toISOString() || new Date().toISOString(),
+              type: 'video',
+              src: `/api/video-stream?key=${encodeURIComponent(obj.Key || '')}`,
+              size: obj.Size || 0,
+              username: username
+            });
           }
         }
       }
@@ -80,32 +118,34 @@ export async function GET(request: Request) {
       console.error('Erreur lors de la récupération des vidéos S3:', error);
     }
 
-    // 2. Récupérer les vidéos locales publiques
-    try {
-      const publicVideosDir = path.join(process.cwd(), 'public', 'videos');
-      const files = await fs.readdir(publicVideosDir);
-      const publicVideoFiles = files.filter(file => 
-        file.endsWith('.mp4') || 
-        file.endsWith('.mov') ||
-        file.endsWith('.webm') ||
-        file.endsWith('.avi')
-      );
+    // Ne pas inclure les vidéos publiques si on veut uniquement les vidéos de l'utilisateur
+    if (!userOnly) {
+      try {
+        const publicVideosDir = path.join(process.cwd(), 'public', 'videos');
+        const files = await fs.readdir(publicVideosDir);
+        const publicVideoFiles = files.filter(file => 
+          file.endsWith('.mp4') || 
+          file.endsWith('.mov') ||
+          file.endsWith('.webm') ||
+          file.endsWith('.avi')
+        );
 
-      const publicVideos = publicVideoFiles.map((filename, index) => ({
-        id: `local-${index}`,
-        key: filename,
-        filename,
-        title: filename.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase()),
-        date: new Date().toISOString(),
-        type: 'video',
-        src: `/videos/${filename}`,
-        size: 0,
-        username: 'Public'
-      }));
+        const publicVideos = publicVideoFiles.map((filename, index) => ({
+          id: `local-${index}`,
+          key: filename,
+          filename,
+          title: filename.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase()),
+          date: new Date().toISOString(),
+          type: 'video',
+          src: `/videos/${filename}`,
+          size: 0,
+          username: 'Public'
+        }));
 
-      allVideos = [...allVideos, ...publicVideos];
-    } catch (error) {
-      console.error('Erreur lors de la récupération des vidéos locales:', error);
+        allVideos = [...allVideos, ...publicVideos];
+      } catch (error) {
+        console.error('Erreur lors de la récupération des vidéos locales:', error);
+      }
     }
 
     // Trier les vidéos par date (les plus récentes en premier)
