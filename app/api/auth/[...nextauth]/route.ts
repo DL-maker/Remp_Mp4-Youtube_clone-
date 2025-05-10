@@ -1,19 +1,24 @@
 import { NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabaseClient';
+import { prisma } from '@/lib/prisma';
 import bcrypt from 'bcrypt';
+import { encrypt } from '@/app/_lib/session';
+import { cookies } from 'next/headers';
 
 export async function POST(request: Request) {
   try {
-    const { email, password } = await request.json();
+    const body = await request.json();
+    const { username, password } = body;
+
+    if (!username || !password) {
+      return NextResponse.json({ error: 'Missing credentials' }, { status: 400 });
+    }
 
     // Vérifier si l'utilisateur existe
-    const { data: user, error: userError } = await supabase
-      .from('users')
-      .select('*')
-      .eq('email', email)
-      .single();
+    const user = await prisma.user.findUnique({
+      where: { username },
+    });
 
-    if (userError || !user) {
+    if (!user) {
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
 
@@ -23,20 +28,27 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Invalid password' }, { status: 401 });
     }
 
-    // Créer une session utilisateur
-    const { data: session, error: sessionError } = await supabase.auth.signInWithPassword({
-      email,
-      password,
+    // Créer une session
+    const expires = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000); // 7 jours
+    const session = await encrypt({ userId: user.id, expires });
+    
+    // Définir le cookie de session
+    cookies().set('session', session, {
+      expires,
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      path: '/',
     });
-
-    if (sessionError) {
-      return NextResponse.json({ error: sessionError.message }, { status: 400 });
-    }
 
     return NextResponse.json({
-      message: 'Login successful',
-      session,
+      user: {
+        id: user.id,
+        username: user.username,
+        email: user.email,
+      }
     });
+    
   } catch (error: any) {
     console.error('Login error:', error);
     return NextResponse.json(

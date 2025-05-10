@@ -120,7 +120,11 @@ const ColumnOfVideo = () => {
                     alt="Profile"
                     width={24}
                     height={24}
-                    className="rounded-full"
+                    className="rounded-full cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/user/${encodeURIComponent(video.username)}`);
+                    }}
                   />
                 </div>
                 <div>

@@ -15,6 +15,12 @@ interface ProfileState {
     Abonner: number;
   };
   error?: string;
+  videos?: Array<{
+    key: string;
+    url: string;
+    lastModified: string;
+    size: number;
+  }>;
 }
 
 export default function ProfilePage() {
@@ -35,24 +41,30 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const response = await fetch('/api/session');
-      const result = await response.json();
+      try {
+        const [profileResponse, videosResponse] = await Promise.all([
+          fetch('/api/session'),
+          fetch('/api/users/videos')
+        ]);
 
-      if (response.status === 401) {
-        router.push('/login');
-        return;
-      }
+        if (profileResponse.status === 401 || videosResponse.status === 401) {
+          router.push('/login');
+          return;
+        }
 
-      if (response.status !== 200) {
-        setState({ error: result.error });
-      } else {
-        setState({
-          userId: result.userId,
-          username: result.username,
-          email: result.email,
-          createdAt: result.createdAt,
-          stats: { Video: 0, likes: 0, Abonner: 0 }
-        });
+        const profileData = await profileResponse.json();
+        const videosData = await videosResponse.json();
+
+        setState(prevState => ({
+          ...prevState,
+          ...profileData,
+          videos: videosData.videos
+        }));
+      } catch (error) {
+        setState(prevState => ({
+          ...prevState,
+          error: "Erreur lors du chargement du profil"
+        }));
       }
     };
 
@@ -114,7 +126,7 @@ export default function ProfilePage() {
   if (state.error) {
     return (
       <>
-        <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
+
         <div className="text-red-500 text-center p-4">{state.error}</div>
       </>
     );
@@ -172,6 +184,30 @@ export default function ProfilePage() {
                     <div className="text-gray-600">Abonner</div>
                   </div>
                 </div>
+              </div>
+
+              <div className="bg-white rounded-lg shadow-lg p-6 mt-8">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Mes Vidéos</h2>
+                {state.videos && state.videos.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {state.videos.map((video, index) => (
+                      <div key={index} className="bg-gray-50 rounded-lg overflow-hidden">
+                        <video
+                          className="w-full aspect-video object-cover"
+                          src={video.url}
+                          controls
+                        />
+                        <div className="p-4">
+                          <p className="text-sm text-gray-600">
+                            Publié le {new Date(video.lastModified).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 text-center">Aucune vidéo publiée</p>
+                )}
               </div>
 
               <div className="bg-white rounded-lg shadow-lg p-6 mt-8">

@@ -119,10 +119,16 @@ function VideoPageContent() {
                   <img
                     src="/Photo_profile_light_mode.png"
                     alt="Profile"
-                    className="w-12 h-12 rounded-full mr-4"
+                    className="w-12 h-12 rounded-full mr-4 cursor-pointer"
+                    onClick={() => router.push(`/user/${encodeURIComponent(selectedVideo.username)}`)}
                   />
                   <div>
-                    <p className="font-semibold text-gray-800">{selectedVideo.username}</p>
+                    <p 
+                      className="font-semibold text-gray-800 cursor-pointer hover:text-blue-600"
+                      onClick={() => router.push(`/user/${encodeURIComponent(selectedVideo.username)}`)}
+                    >
+                      {selectedVideo.username}
+                    </p>
                     <p className="text-sm text-gray-500">
                       {new Date(selectedVideo.date).toLocaleDateString()}
                     </p>
