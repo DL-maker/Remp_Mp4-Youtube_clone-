@@ -33,7 +33,9 @@ export async function POST(request: Request) {
     const session = await encrypt({ userId: user.id, expires });
     
     // Définir le cookie de session
-    cookies().set('session', session, {
+    (await
+      // Définir le cookie de session
+      cookies()).set('session', session, {
       expires,
       httpOnly: true,
       secure: process.env.NODE_ENV === 'production',

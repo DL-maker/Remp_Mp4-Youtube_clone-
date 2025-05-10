@@ -152,18 +152,24 @@ export default function UserProfilePage() {
                       src={video.src}
                       preload="metadata"
                       muted
+                      playsInline
                       onMouseEnter={(e) => {
                         const videoElement = e.currentTarget;
-                        videoElement.play().catch(err => console.error('Erreur de lecture:', err));
+                        if (videoElement.paused) {
+                          videoElement.play()
+                            .catch(err => {
+                              // Si la vidéo ne peut pas être lue, on ne fait rien
+                              console.log('Lecture impossible:', err);
+                            });
+                        }
                       }}
                       onMouseLeave={(e) => {
                         const videoElement = e.currentTarget;
-                        videoElement.pause();
-                        videoElement.currentTime = 0;
+                        if (!videoElement.paused) {
+                          videoElement.pause();
+                        }
                       }}
-                    >
-                      <source src={video.src} type="video/mp4" />
-                    </video>
+                    />
                   </div>
                   <div className="p-4">
                     <h3 className="font-medium text-gray-900 mb-1 line-clamp-2">{video.title}</h3>

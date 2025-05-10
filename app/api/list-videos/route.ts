@@ -52,19 +52,27 @@ export async function GET(request: Request) {
           const pathParts = obj.Key?.split('/');
           if (pathParts && pathParts.length >= 3) {
             const username = pathParts[1];
-            const filename = pathParts[pathParts.length - 1];
-            
-            allVideos.push({
-              id: `s3-${obj.Key}`,
-              key: obj.Key || '',
-              filename,
-              title: filename.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase()),
-              date: obj.LastModified?.toISOString() || new Date().toISOString(),
-              type: 'video',
-              src: `/api/video-stream?key=${encodeURIComponent(obj.Key || '')}`,
-              size: obj.Size || 0,
-              username: username
+
+            // Vérifier si l'utilisateur est en mode invisible
+            const user = await prisma.user.findUnique({
+              where: { username },
+              select: { isInvisible: true }
             });
+
+            // Ne pas inclure les vidéos des utilisateurs en mode invisible
+            if (!user?.isInvisible) {
+              allVideos.push({
+                id: `s3-${obj.Key}`,
+                key: obj.Key || '',
+                filename: pathParts[pathParts.length - 1],
+                title: pathParts[pathParts.length - 1].replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase()),
+                date: obj.LastModified?.toISOString() || new Date().toISOString(),
+                type: 'video',
+                src: `/api/video-stream?key=${encodeURIComponent(obj.Key || '')}`,
+                size: obj.Size || 0,
+                username: username
+              });
+            }
           }
         }
       }
