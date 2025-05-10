@@ -4,52 +4,26 @@ import React, { useState, useEffect, useRef, useCallback } from "react";
 import { useRouter } from "next/navigation";
 import Image from "next/image";
 
-const VIDEO_LOAD_LIMIT = 10; // Limite du nombre de vidéos chargées à chaque fois
-
-// Fonction pour générer un nom d'utilisateur basé sur la source de la vidéo
-function generateRandomName(videoSource: string = '') {
-  // Si la vidéo provient du dossier /videos/ local, c'est une vidéo locale
-  if (videoSource.startsWith('/videos/') || !videoSource.includes('amazonaws.com')) {
-    return 'No account - local storage';
-  }
-  
-  // Sinon, c'est une vidéo AWS, générer un nom aléatoire
-  const firstNames = ["Alice", "Bob", "Charlie", "Diana", "Eve", "Frank"];
-  const lastNames = ["Smith", "Johnson", "Brown", "Taylor", "Anderson", "Lee"];
-  const firstName = firstNames[Math.floor(Math.random() * firstNames.length)];
-  const lastName = lastNames[Math.floor(Math.random() * lastNames.length)];
-  return `${firstName} ${lastName}`;
+// Interface pour représenter une vidéo
+interface Video {
+  src: string;
+  title: string;
+  key: string;
+  username: string;
+  date: string;
 }
 
+const VIDEO_LOAD_LIMIT = 10;
+
 // Fonction pour récupérer la liste des vidéos depuis l'API
-async function fetchVideoList(startIndex: number, limit: number) {
+async function fetchVideoList(startIndex: number, limit: number): Promise<Video[]> {
   try {
     const response = await fetch(`/api/list-videos?start=${startIndex}&limit=${limit}`);
     if (!response.ok) {
       throw new Error(`Erreur HTTP: ${response.status}`);
     }
-    
-    // Les données retournées sont maintenant des objets plus complexes
     const videoFiles = await response.json();
-    
-    return videoFiles.map((video: any) => {
-      // Vérifier si video est un objet avec une propriété filename ou un simple string
-      const name = typeof video === 'string' ? video : (video.filename || '');
-      const src = typeof video === 'string' 
-        ? `/videos/${video}` 
-        : (video.url || `/videos/${video.filename || ''}`);
-      
-      // S'assurer que name est bien une chaîne avant d'appliquer replace
-      const title = typeof name === 'string'
-        ? name.replace(/_/g, " ").replace(/\b\w/g, (c: string) => c.toUpperCase())
-        : 'Vidéo sans titre';
-      
-      return {
-        src,
-        title,
-        key: typeof video === 'string' ? video : (video.id || video.filename || Date.now().toString()),
-      };
-    });
+    return videoFiles;
   } catch (error) {
     console.error("Erreur lors de la récupération des vidéos:", error);
     throw error;
@@ -57,7 +31,7 @@ async function fetchVideoList(startIndex: number, limit: number) {
 }
 
 const ColumnOfVideo = () => {
-  const [videos, setVideos] = useState<Array<{ src: string; title: string; key: string }>>([]);
+  const [videos, setVideos] = useState<Video[]>([]);
   const [loading, setLoading] = useState(false);
   const [hasMore, setHasMore] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -106,7 +80,6 @@ const ColumnOfVideo = () => {
 
   return (
     <div className="p-4">
-
       {error && (
         <div className="bg-red-100 text-red-800 p-4 rounded-lg mb-4 text-center">
           {error}
@@ -116,38 +89,45 @@ const ColumnOfVideo = () => {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-8">
         {videos.map((video, index) => (
           <div
-            key={`${video.key}-${index}`} // Assurez-vous que la clé est unique
+            key={`${video.key}-${index}`}
             className="group relative cursor-pointer rounded-lg overflow-hidden shadow-lg hover:shadow-2xl transition-shadow"
-            onClick={() => router.push(`/video_page?videoId=${video.key}`)}
+            onClick={() => router.push(`/video_page?videoId=${encodeURIComponent(video.key)}`)}
             role="button"
             tabIndex={0}
             aria-label={`Lire la vidéo ${video.title}`}
-            onKeyDown={(e) => e.key === "Enter" && router.push(`/video_page?videoId=${video.key}`)}
+            onKeyDown={(e) => e.key === "Enter" && router.push(`/video_page?videoId=${encodeURIComponent(video.key)}`)}
           >
-            {/* Vidéo */}
-            <video
-              width="100%"
-              className="rounded-lg group-hover:opacity-75 transition-opacity aspect-video"
-              controls={false}
-              muted
-              loop
-              onMouseEnter={(e) => (e.currentTarget as HTMLVideoElement).play()}
-              onMouseLeave={(e) => (e.currentTarget as HTMLVideoElement).pause()}
-            >
-              <source src={video.src} type="video/mp4" />
-              Votre navigateur ne supporte pas la lecture des vidéos.
-            </video>
+            <div className="aspect-video relative overflow-hidden">
+              <video
+                className="w-full h-full object-cover rounded-lg group-hover:opacity-75 transition-opacity"
+                controls={false}
+                muted
+                loop
+                onMouseEnter={(e) => (e.currentTarget as HTMLVideoElement).play()}
+                onMouseLeave={(e) => (e.currentTarget as HTMLVideoElement).pause()}
+              >
+                <source src={video.src} type="video/mp4" />
+                Votre navigateur ne supporte pas la lecture des vidéos.
+              </video>
+            </div>
 
-            {/* Profil en dessous */}
-            <div className="flex items-center mt-4 space-x-2">
-              <Image
-                src={"https://thispersondoesnotexist.com"}
-                alt="Profile"
-                width={40}
-                height={40}
-                className="rounded-full h-10 w-10 object-cover cursor-pointer"
-              />
-              <span className="text-sm font-medium">{generateRandomName(video.src)}</span>
+            <div className="p-4">
+              <h3 className="text-lg font-semibold mb-2 line-clamp-2">{video.title}</h3>
+              <div className="flex items-center space-x-2">
+                <div className="flex-shrink-0">
+                  <Image
+                    src="/Photo_profile_light_mode.png"
+                    alt="Profile"
+                    width={24}
+                    height={24}
+                    className="rounded-full"
+                  />
+                </div>
+                <div>
+                  <p className="text-sm text-gray-600">{video.username}</p>
+                  <p className="text-xs text-gray-400">{new Date(video.date).toLocaleDateString()}</p>
+                </div>
+              </div>
             </div>
           </div>
         ))}
@@ -155,18 +135,12 @@ const ColumnOfVideo = () => {
 
       {loading && (
         <div className="text-center py-4">
-          <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-blue-500 mx-auto" />
-          <p className="mt-2 text-sm text-gray-500">Chargement des vidéos...</p>
+          <div className="inline-block h-8 w-8 animate-spin rounded-full border-4 border-solid border-current border-r-transparent align-[-0.125em] motion-reduce:animate-[spin_1.5s_linear_infinite]" />
+          <p className="mt-2 text-gray-600">Chargement des vidéos...</p>
         </div>
       )}
 
-      {!hasMore && !loading && (
-        <div className="text-center py-4 text-gray-600">
-          Toutes les vidéos ont été chargées.
-        </div>
-      )}
-
-      <div ref={observerTarget} className="h-10" />
+      <div ref={observerTarget} className="h-4" />
     </div>
   );
 };
