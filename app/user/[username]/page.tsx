@@ -36,19 +36,31 @@ export default function UserProfilePage() {
       try {
         // Récupérer les informations de l'utilisateur
         const userResponse = await fetch(`/api/users/${encodeURIComponent(username)}`);
-        if (userResponse.status === 404) {
-          setError('Utilisateur non trouvé');
+        
+        if (userResponse.status === 403) {
+          setError('Ce profil est privé');
+          setIsLoading(false);
           return;
         }
-        if (!userResponse.ok) {
-          throw new Error('Erreur lors du chargement du profil');
+        
+        if (userResponse.status === 404) {
+          setError('Utilisateur non trouvé');
+          setIsLoading(false);
+          return;
         }
+        
+        if (!userResponse.ok) {
+          const errorData = await userResponse.json();
+          throw new Error(errorData.error || 'Erreur lors du chargement du profil');
+        }
+        
         const userData = await userResponse.json();
 
         // Récupérer les vidéos de l'utilisateur
         const videosResponse = await fetch(`/api/users/${encodeURIComponent(username)}/videos`);
         if (!videosResponse.ok) {
-          throw new Error('Erreur lors du chargement des vidéos');
+          const errorData = await videosResponse.json();
+          throw new Error(errorData.error || 'Erreur lors du chargement des vidéos');
         }
         const videosData = await videosResponse.json();
 
@@ -58,7 +70,8 @@ export default function UserProfilePage() {
           videos: videosData.videos
         });
       } catch (err) {
-        setError('Une erreur est survenue lors du chargement du profil');
+        const error = err as Error;
+        setError(error.message || 'Une erreur est survenue lors du chargement du profil');
         console.error('Erreur:', err);
       } finally {
         setIsLoading(false);
@@ -85,8 +98,22 @@ export default function UserProfilePage() {
     return (
       <div className="min-h-screen bg-gray-50">
         <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
-        <div className="flex justify-center items-center h-[calc(100vh-64px)]">
-          <div className="bg-red-100 text-red-800 p-4 rounded-lg">{error}</div>
+        <div className="flex flex-col justify-center items-center h-[calc(100vh-64px)]">
+          <div className="bg-red-100 text-red-800 p-6 rounded-lg text-center max-w-md">
+            <h2 className="text-xl font-semibold mb-2">Profil non accessible</h2>
+            <p>{error}</p>
+            {error === 'Ce profil est privé' && (
+              <p className="mt-2 text-sm text-red-600">
+                L&apos;utilisateur a choisi de rendre son profil privé.
+              </p>
+            )}
+          </div>
+          <button
+            onClick={() => router.back()}
+            className="mt-4 px-4 py-2 bg-gray-600 text-white rounded hover:bg-gray-700 transition-colors"
+          >
+            Retour
+          </button>
         </div>
       </div>
     );

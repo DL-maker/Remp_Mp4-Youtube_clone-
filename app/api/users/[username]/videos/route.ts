@@ -1,5 +1,8 @@
 import { NextResponse } from 'next/server';
 import { S3Client, ListObjectsV2Command } from "@aws-sdk/client-s3";
+import { cookies } from 'next/headers';
+import { decrypt } from '@/app/_lib/session';
+import { prisma } from '@/lib/prisma';
 
 const s3Client = new S3Client({
   region: process.env.AWS_REGION,
@@ -16,40 +19,53 @@ export async function GET(
   try {
     const username = params.username;
     
-    // Chercher les vidéos dans le dossier de l'utilisateur
-    const command = new ListObjectsV2Command({
-      Bucket: process.env.AWS_BUCKET_NAME!,
-      Prefix: `users/${username}/`,
+    // Vérifier si l'utilisateur existe et s'il est en mode invisible
+    const user = await prisma.user.findUnique({
+      where: { username },
+      select: {
+        id: true,
+        isInvisible: true,
+      },
     });
 
-    const response = await s3Client.send(command);
-    
-    if (!response.Contents) {
-      return NextResponse.json({ videos: [] });
+    if (!user) {
+      return NextResponse.json({ error: 'Utilisateur non trouvé' }, { status: 404 });
     }
 
-    // Filtrer pour ne garder que les fichiers vidéo
-    const videos = response.Contents
-      .filter(obj => obj.Key && !obj.Key.endsWith('/') && !obj.Key.endsWith('metadata.json'))
-      .map(obj => {
-        const key = obj.Key!;
-        const filename = key.split('/').pop()!;
-        return {
-          id: `s3-${key}`,
-          key: key,
-          filename: filename,
-          title: filename.split('-').slice(1).join('-').replace(/_/g, ' '),
-          date: obj.LastModified?.toISOString() || new Date().toISOString(),
-          type: 'video',
-          src: `https://${process.env.AWS_BUCKET_NAME}.s3.${process.env.AWS_REGION}.amazonaws.com/${key}`,
-          size: obj.Size || 0,
-          username: username
-        };
-      });
+    // Si l'utilisateur est en mode invisible, vérifier si le demandeur est le propriétaire du profil
+    if (user.isInvisible) {
+      const sessionCookie = (await cookies()).get('session')?.value;
+      if (!sessionCookie) {
+        return NextResponse.json({ error: 'Profil privé' }, { status: 403 });
+      }
 
-    return NextResponse.json({ videos });
+      const session = await decrypt(sessionCookie);
+      const requestingUserId = session?.userId;
+
+      // Si l'utilisateur qui fait la requête n'est pas le propriétaire du profil
+      if (requestingUserId !== user.id) {
+        return NextResponse.json({ error: 'Profil privé' }, { status: 403 });
+      }
+    }
+
+    // Si tout est ok, récupérer les vidéos de l'utilisateur
+    const videos = await prisma.video.findMany({
+      where: { userId: user.id },
+      select: {
+        id: true,
+        title: true,
+        url: true,
+        createdAt: true,
+      },
+      orderBy: { createdAt: 'desc' },
+    });
+
+    return NextResponse.json({ videos: videos });
   } catch (error) {
     console.error('Erreur lors de la récupération des vidéos:', error);
-    return NextResponse.json({ error: 'Erreur lors de la récupération des vidéos' }, { status: 500 });
+    return NextResponse.json(
+      { error: 'Erreur lors de la récupération des vidéos' },
+      { status: 500 }
+    );
   }
 }
