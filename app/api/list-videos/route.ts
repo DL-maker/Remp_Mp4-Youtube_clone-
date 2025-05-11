@@ -88,15 +88,47 @@ export async function GET(request: Request) {
               continue;
             }
 
-            // Pour l'affichage public, on vérifie si l'utilisateur est en mode invisible
+            // Vérifier si l'utilisateur est en mode invisible
             if (!userOnly) {
               const user = await prisma.user.findUnique({
                 where: { username },
-                select: { isInvisible: true }
+                select: { 
+                  id: true,
+                  isInvisible: true,
+                  accessToken: true
+                }
               });
 
               if (user?.isInvisible) {
-                continue;
+                // Vérifier le token d'accès dans l'URL
+                const accessToken = url.searchParams.get('accessToken');
+                if (accessToken !== user.accessToken) {
+                  // Vérifier si l'utilisateur connecté a accès
+                  const sessionCookie = (await cookies()).get('session')?.value;
+                  if (sessionCookie) {
+                    const session = await decrypt(sessionCookie);
+                    const requestingUserId = session?.userId;
+
+                    if (requestingUserId) {
+                      const hasAccess = await prisma.profileAccess.findFirst({
+                        where: {
+                          OR: [
+                            { granterId: user.id, receiverId: requestingUserId },
+                            { granterId: requestingUserId, receiverId: user.id }
+                          ]
+                        }
+                      });
+
+                      if (!hasAccess && requestingUserId !== user.id) {
+                        continue;
+                      }
+                    } else {
+                      continue;
+                    }
+                  } else {
+                    continue;
+                  }
+                }
               }
             }
 

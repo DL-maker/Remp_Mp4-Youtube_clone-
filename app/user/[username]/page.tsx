@@ -26,6 +26,8 @@ export default function UserProfilePage() {
   const params = useParams();
   const router = useRouter();
   const username = params.username as string;
+  const searchParams = new URLSearchParams(window.location.search);
+  const accessToken = searchParams.get('accessToken');
 
   const toggleColumn = () => {
     setIsOpen(!isOpen);
@@ -34,8 +36,12 @@ export default function UserProfilePage() {
   useEffect(() => {
     const fetchUserProfile = async () => {
       try {
-        // Récupérer les informations de l'utilisateur
-        const userResponse = await fetch(`/api/users/${encodeURIComponent(username)}`);
+        // Construire l'URL avec le token d'accès si présent
+        const userUrl = accessToken 
+          ? `/api/users/${encodeURIComponent(username)}?accessToken=${accessToken}`
+          : `/api/users/${encodeURIComponent(username)}`;
+        
+        const userResponse = await fetch(userUrl);
         
         if (userResponse.status === 403) {
           setError('Ce profil est privé');
@@ -56,8 +62,12 @@ export default function UserProfilePage() {
         
         const userData = await userResponse.json();
 
-        // Récupérer les vidéos de l'utilisateur
-        const videosResponse = await fetch(`/api/users/${encodeURIComponent(username)}/videos`);
+        // Construire l'URL pour les vidéos avec le token d'accès si présent
+        const videosUrl = accessToken 
+          ? `/api/users/${encodeURIComponent(username)}/videos?accessToken=${accessToken}`
+          : `/api/users/${encodeURIComponent(username)}/videos`;
+          
+        const videosResponse = await fetch(videosUrl);
         if (!videosResponse.ok) {
           const errorData = await videosResponse.json();
           throw new Error(errorData.error || 'Erreur lors du chargement des vidéos');

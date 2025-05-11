@@ -1,6 +1,7 @@
 'use client';
 
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 import Navbar from '@/components/navbar';
 import { SignUpForm } from './form';
 
@@ -8,7 +9,7 @@ interface LoginState {
   error?: string;
 }
 
-function LoginForm() {
+function LoginForm({ onSuccess }: { onSuccess: () => void }) {
   const [state, setState] = useState<LoginState>({});
 
   const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
@@ -30,7 +31,7 @@ function LoginForm() {
       const data = await response.json();
 
       if (response.ok) {
-        window.location.href = '/profile';
+        onSuccess();
       } else {
         setState({ error: data.error || 'Erreur lors de la connexion' });
       }
@@ -80,9 +81,16 @@ function LoginForm() {
 export default function SignInPage() {
   const [isSignUp, setIsSignUp] = useState(false);
   const [isColumnOpen, setIsColumnOpen] = useState(false);
+  const router = useRouter();
 
   const toggleColumn = () => {
     setIsColumnOpen((prev) => !prev);
+  };
+
+  const handleLoginSuccess = () => {
+    const searchParams = new URLSearchParams(window.location.search);
+    const redirectUrl = searchParams.get('redirect') || '/';
+    router.push(redirectUrl);
   };
 
   return (
@@ -117,7 +125,7 @@ export default function SignInPage() {
             </button>
           </div>
 
-          {isSignUp ? <SignUpForm /> : <LoginForm />}
+          {isSignUp ? <SignUpForm /> : <LoginForm onSuccess={handleLoginSuccess} />}
         </div>
       </div>
     </>

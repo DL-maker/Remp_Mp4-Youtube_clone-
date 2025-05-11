@@ -9,18 +9,21 @@ const SettingsPage = () => {
   const [language, setLanguage] = useState<string>("fr");
   const [isMuxEnabled, setIsMuxEnabled] = useState<boolean>(false);
   const [isInvisibleMode, setIsInvisibleMode] = useState<boolean>(false);
+  const [accessToken, setAccessToken] = useState<string>("");
+  const [inputAccessToken, setInputAccessToken] = useState<string>("");
   const [apiUrl, setApiUrl] = useState<string>("");
   const [hasAccount, setHasAccount] = useState<boolean>(true);
+  const [message, setMessage] = useState<{text: string, type: 'success' | 'error'} | null>(null);
   const router = useRouter();
 
   useEffect(() => {
-    // Charger les paramètres utilisateur au montage du composant
     const loadUserSettings = async () => {
       try {
         const response = await fetch('/api/user-settings');
         if (response.ok) {
           const settings = await response.json();
           setIsInvisibleMode(settings.isInvisible || false);
+          setAccessToken(settings.accessToken || "");
         }
       } catch (error) {
         console.error('Erreur lors du chargement des paramètres:', error);
@@ -52,13 +55,102 @@ const SettingsPage = () => {
 
       if (response.ok) {
         setIsInvisibleMode(!isInvisibleMode);
-        alert(isInvisibleMode ? "Mode visible activé" : "Mode invisible activé");
+        
+        // Générer un nouveau token d'accès si le mode invisible est activé
+        if (!isInvisibleMode) {
+          const tokenResponse = await fetch('/api/user-settings/access', {
+            method: 'POST'
+          });
+          if (tokenResponse.ok) {
+            const data = await tokenResponse.json();
+            setAccessToken(data.accessToken);
+            setMessage({
+              text: "Mode invisible activé et lien d'accès généré",
+              type: 'success'
+            });
+          }
+        } else {
+          setAccessToken("");
+          setMessage({
+            text: "Mode visible activé",
+            type: 'success'
+          });
+        }
       } else {
-        alert("Erreur lors de la modification du mode");
+        setMessage({
+          text: "Erreur lors de la modification du mode",
+          type: 'error'
+        });
       }
     } catch (error) {
       console.error('Erreur lors du changement de mode:', error);
-      alert("Erreur lors de la modification du mode");
+      setMessage({
+        text: "Erreur lors de la modification du mode",
+        type: 'error'
+      });
+    }
+  };
+
+  const handleGenerateNewToken = async () => {
+    try {
+      const response = await fetch('/api/user-settings/access', {
+        method: 'POST'
+      });
+      
+      if (response.ok) {
+        const data = await response.json();
+        setAccessToken(data.accessToken);
+        setMessage({
+          text: "Nouveau lien d'accès généré avec succès",
+          type: 'success'
+        });
+      } else {
+        setMessage({
+          text: "Erreur lors de la génération du lien d'accès",
+          type: 'error'
+        });
+      }
+    } catch (error) {
+      console.error('Erreur lors de la génération du token:', error);
+      setMessage({
+        text: "Erreur lors de la génération du lien d'accès",
+        type: 'error'
+      });
+    }
+  };
+
+  const handleSubmitAccessToken = async () => {
+    try {
+      const response = await fetch('/api/user-settings/access', {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          accessToken: inputAccessToken
+        })
+      });
+
+      const data = await response.json();
+      
+      if (response.ok) {
+        setMessage({
+          text: `Accès accordé au profil de ${data.granterUsername}`,
+          type: 'success'
+        });
+        setInputAccessToken('');
+      } else {
+        setMessage({
+          text: data.error || "Erreur lors de l'utilisation du lien d'accès",
+          type: 'error'
+        });
+      }
+    } catch (error) {
+      console.error('Erreur lors de l\'utilisation du token:', error);
+      setMessage({
+        text: "Erreur lors de l'utilisation du lien d'accès",
+        type: 'error'
+      });
     }
   };
 
@@ -86,6 +178,14 @@ const SettingsPage = () => {
 
       <div className="max-w-4xl mx-auto p-8 bg-white shadow-lg rounded-xl mt-16">
         <h1 className="text-4xl font-semibold text-center text-gray-800 mb-8">Paramètres du Compte</h1>
+
+        {message && (
+          <div className={`mb-4 p-4 rounded ${
+            message.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
+          }`}>
+            {message.text}
+          </div>
+        )}
 
         {/* Mode Invisible */}
         <div className="mb-8">
@@ -120,6 +220,58 @@ const SettingsPage = () => {
               </label>
             </div>
           </div>
+
+          {/* Section de partage du lien d'accès */}
+          {isInvisibleMode && (
+            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
+              <h3 className="text-lg font-medium text-gray-800 mb-2">Lien d&apos;accès à votre profil</h3>
+              <div className="flex items-center space-x-2 mb-4">
+                <input
+                  type="text"
+                  readOnly
+                  value={accessToken}
+                  className="flex-1 p-2 border rounded bg-white"
+                />
+                <button
+                  onClick={() => {
+                    navigator.clipboard.writeText(accessToken);
+                    setMessage({
+                      text: "Lien d'accès copié !",
+                      type: 'success'
+                    });
+                  }}
+                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                >
+                  Copier
+                </button>
+                <button
+                  onClick={handleGenerateNewToken}
+                  className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                >
+                  Générer nouveau
+                </button>
+              </div>
+              
+              <div className="mt-6">
+                <h3 className="text-lg font-medium text-gray-800 mb-2">Utiliser un lien d&apos;accès</h3>
+                <div className="flex items-center space-x-2">
+                  <input
+                    type="text"
+                    value={inputAccessToken}
+                    onChange={(e) => setInputAccessToken(e.target.value)}
+                    placeholder="Collez le lien d'accès ici"
+                    className="flex-1 p-2 border rounded"
+                  />
+                  <button
+                    onClick={handleSubmitAccessToken}
+                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  >
+                    Utiliser
+                  </button>
+                </div>
+              </div>
+            </div>
+          )}
         </div>
 
         {/* Sélecteur de Langue */}
@@ -159,7 +311,7 @@ const SettingsPage = () => {
         {/* Input pour entrer l'URL de l'API */}
         <div className="mb-8">
           <label htmlFor="api-url" className="block text-xl font-medium text-gray-700 mb-2">
-            URL de l&apos;API
+            URL de l&apos;API or link to another invisible mode
           </label>
           <input
             type="text"

@@ -15,13 +15,19 @@ model User {
   role          Role
   sessionNumber String?
   createdAt     DateTime  @default(now())
-
-  // Relations
+  isInvisible   Boolean   @default(false)
+  accessToken   String?   @unique // Token unique pour l'accès au compte invisible
+  
+  // Relations existantes
   videos        Video[]
   comments      Comment[]
   likes         LikeDislike[]
   subscriptions Subscription[]
   subscribers   Subscription[] @relation("subscribers")
+
+  // Nouvelles relations pour la gestion des accès
+  grantedAccesses     ProfileAccess[] @relation("GrantedAccesses")
+  receivedAccesses    ProfileAccess[] @relation("ReceivedAccesses")
 }
 
 model Video {
@@ -97,6 +103,23 @@ model Subscription {
   @@unique([subscriberId, channelId])
   @@index([subscriberId])
   @@index([channelId])
+}
+
+model ProfileAccess {
+  id          String   @id @default(uuid())
+  createdAt   DateTime @default(now())
+  
+  // L'utilisateur qui donne l'accès
+  granterId   String
+  granter     User     @relation("GrantedAccesses", fields: [granterId], references: [id])
+  
+  // L'utilisateur qui reçoit l'accès
+  receiverId  String
+  receiver    User     @relation("ReceivedAccesses", fields: [receiverId], references: [id])
+
+  @@unique([granterId, receiverId])
+  @@index([granterId])
+  @@index([receiverId])
 }
 
 enum Role {
