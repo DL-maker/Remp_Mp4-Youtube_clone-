@@ -15,13 +15,25 @@ interface ProfileState {
     Abonner: number;
   };
   error?: string;
+  videos?: Array<{
+    key: string;
+    url: string;
+    lastModified: string;
+    size: number;
+  }>;
 }
 
 export default function ProfilePage() {
-  const router = useRouter();   
+  const router = useRouter();
   const [state, setState] = useState<ProfileState>({});
   const [isEditing, setIsEditing] = useState(false);
   const [isOpen, setIsOpen] = useState(false);
+  const [videoFileToUpload, setVideoFileToUpload] = useState<File | null>(null);
+  const [videoType, setVideoType] = useState("normale");
+  const [isUploading, setIsUploading] = useState(false);
+  const [uploadProgress, setUploadProgress] = useState<number>(0);
+  const [uploadError, setUploadError] = useState<string | null>(null);
+  const [uploadSuccess, setUploadSuccess] = useState<boolean>(false);
 
   const toggleColumn = () => {
     setIsOpen(!isOpen);
@@ -29,34 +41,93 @@ export default function ProfilePage() {
 
   useEffect(() => {
     const fetchProfile = async () => {
-      const response = await fetch('/api/session');
-      const result = await response.json();
+      try {
+        const [profileResponse, videosResponse] = await Promise.all([
+          fetch('/api/session'),
+          fetch('/api/users/videos')
+        ]);
 
-      if (response.status === 401) {
-        router.push('/login');
-        return;
-      }
+        if (profileResponse.status === 401 || videosResponse.status === 401) {
+          router.push('/login');
+          return;
+        }
 
-      if (response.status !== 200) {
-        setState({ error: result.error });
-      } else {
+        const profileData = await profileResponse.json();
+        const videosData = await videosResponse.json();
+
         setState({
-          userId: result.userId,
-          username: result.username,
-          email: result.email,
-          createdAt: result.createdAt,
-          stats: { Video: 0, likes: 0, Abonner: 0 }
+          userId: profileData.id,
+          username: profileData.username,
+          email: profileData.email,
+          createdAt: profileData.createdAt,
+          stats: profileData.stats,
+          videos: videosData,
         });
+      } catch (error: unknown) {
+        console.error('Error fetching profile:', error);
+        setState({ error: error instanceof Error ? error.message : 'Failed to fetch profile' });
       }
     };
 
     fetchProfile();
   }, [router]);
 
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file && file.type.includes("video/")) {
+      setVideoFileToUpload(file);
+    }
+  };
+
+  const handleUpload = async () => {
+    if (!videoFileToUpload) {
+      setUploadError('Veuillez sélectionner un fichier vidéo.');
+      return;
+    }
+
+    setIsUploading(true);
+    setUploadProgress(0);
+    setUploadError(null);
+    setUploadSuccess(false);
+
+    const formData = new FormData();
+    formData.append('video', videoFileToUpload);
+    formData.append('type', videoType); // Si ton API route /api/videos/upload attend le type
+
+    try {
+      const response = await fetch('/api/upload-video', { // Assure-toi que c'est la bonne URL
+        method: 'POST',
+        body: formData,
+        // Ne pas inclure de headers Content-Type, fetch s'en occupe pour FormData
+      });
+
+      const result = await response.json();
+
+      setIsUploading(false);
+
+      if (response.ok) {
+        setUploadSuccess(true);
+        console.log('Upload réussi:', result);
+        // Réinitialiser la sélection de fichier après l'upload
+        setVideoFileToUpload(null);
+        if (document.getElementById("videoInput") instanceof HTMLInputElement) {
+          (document.getElementById("videoInput") as HTMLInputElement).value = "";
+        }
+      } else {
+        setUploadError(result?.error || 'Erreur lors de l\'upload de la vidéo.');
+        console.error('Erreur d\'upload:', result);
+      }
+    } catch (error) {
+      setIsUploading(false);
+      setUploadError('Erreur réseau lors de l\'upload.');
+      console.error('Erreur lors de l\'upload:', error);
+    }
+  };
+
   if (state.error) {
     return (
       <>
-        <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
+
         <div className="text-red-500 text-center p-4">{state.error}</div>
       </>
     );
@@ -65,7 +136,7 @@ export default function ProfilePage() {
   return (
     <div className="min-h-screen bg-gray-50">
       <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
-      
+
       <div className="py-8">
         <div className="max-w-4xl mx-auto px-4">
           {!state.userId ? (
@@ -116,8 +187,88 @@ export default function ProfilePage() {
                 </div>
               </div>
 
+              <div className="bg-white rounded-lg shadow-lg p-6 mt-8">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Mes Vidéos</h2>
+                {state.videos && state.videos.length > 0 ? (
+                  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+                    {state.videos.map((video, index) => (
+                      <div key={index} className="bg-gray-50 rounded-lg overflow-hidden">
+                        <video
+                          className="w-full aspect-video object-cover"
+                          src={video.url}
+                          controls
+                        />
+                        <div className="p-4">
+                          <p className="text-sm text-gray-600">
+                            Publié le {new Date(video.lastModified).toLocaleDateString()}
+                          </p>
+                        </div>
+                      </div>
+                    ))}
+                  </div>
+                ) : (
+                  <p className="text-gray-500 text-center">Aucune vidéo publiée</p>
+                )}
+              </div>
+
+              <div className="bg-white rounded-lg shadow-lg p-6 mt-8">
+                <h2 className="text-xl font-bold text-gray-900 mb-4">Upload une nouvelle vidéo</h2>
+                <div>
+                  <label htmlFor="videoInput" className="block text-sm font-medium text-gray-700 mb-2">
+                    Sélectionner un fichier vidéo
+                  </label>
+                  <input
+                    id="videoInput"
+                    type="file"
+                    accept="video/mp4,video/webm"
+                    onChange={handleFileChange}
+                    className="block w-full text-sm text-gray-500 file:mr-4 file:py-2 file:px-4 file:border-0 file:rounded-lg file:bg-indigo-50 file:text-indigo-700 hover:file:bg-indigo-100"
+                  />
+                </div>
+
+                <div className="mt-4">
+                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                    Type de vidéo
+                  </label>
+                  <div className="flex space-x-4">
+                    <label className="inline-flex items-center">
+                      <input
+                        type="radio"
+                        value="normale"
+                        checked={videoType === "normale"}
+                        onChange={(e) => setVideoType(e.target.value)}
+                        className="form-radio text-indigo-600"
+                      />
+                      <span className="ml-2 pl-2">Normale</span>
+                    </label>
+                    <label className="inline-flex items-center">
+                      <input
+                        type="radio"
+                        value="short"
+                        checked={videoType === "short"}
+                        onChange={(e) => setVideoType(e.target.value)}
+                        className="form-radio text-indigo-600"
+                      />
+                      <span className="ml-2">Short</span>
+                    </label>
+                  </div>
+                </div>
+
+                <button
+                  onClick={handleUpload}
+                  disabled={isUploading || !videoFileToUpload}
+                  className="mt-6 px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                >
+                  {isUploading ? "Téléchargement..." : "Publier la vidéo"}
+                </button>
+
+                {uploadProgress > 0 && <p className="mt-2">Progression de l&apos;upload: {uploadProgress}%</p>}
+                {uploadError && <p className="mt-2 text-red-500">Erreur d&apos;upload: {uploadError}</p>}
+                {uploadSuccess && <p className="mt-2 text-green-500">Upload réussi!</p>}
+              </div>
+
               {isEditing && (
-                <div className="bg-white rounded-lg shadow-lg p-6">
+                <div className="bg-white rounded-lg shadow-lg p-6 mt-8">
                   <h2 className="text-xl font-bold text-gray-900 mb-4">Profile Settings</h2>
                   <div className="space-y-4">
                     <div>

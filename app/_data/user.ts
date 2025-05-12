@@ -59,7 +59,7 @@ export const getUser = cache(async (): Promise<User> => {
   // Fetch user data with all relations defined in schema
   const user = await prisma.user.findUnique({
     where: {
-      id: Number(userId),
+      id: userId,
     },
     select: {
       id: true,

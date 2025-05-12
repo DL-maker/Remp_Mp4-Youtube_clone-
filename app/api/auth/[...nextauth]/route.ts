@@ -1,45 +1,22 @@
-import NextAuth from "next-auth";
-import CredentialsProvider from "next-auth/providers/credentials";
-import type { AuthOptions } from "next-auth";
-import type { NextRequest } from "next/server";
+import { NextResponse } from 'next/server';
 
-const authOptions: AuthOptions = {
-  providers: [
-    CredentialsProvider({
-      name: "Credentials",
-      credentials: {
-        username: { label: "Username", type: "text" },
-        password: { label: "Password", type: "password" }
-      },
-      async authorize(credentials) {
-        const user = {
-          id: 1,  // Assuming this is a number from your database
-          username: "test",
-          email: "test@example.com"
-        };
+// This file is conventionally used for NextAuth.js catch-all routes.
+// To remove NextAuth, we are replacing its content to indicate it's not in use.
 
-        if (credentials?.username === "test" && credentials?.password === "test") {
-          return {
-            id: user.id.toString(),  // Convert id to string
-            name: user.username,
-            email: user.email
-          };
-        }
-        return null;
-      }
-    })
-  ],
-  pages: {
-    signIn: "/auth/signin",
-  }
-};
-
-const handler = NextAuth(authOptions);
-
-export async function GET(request: NextRequest) {
-  return handler(request);
+export async function GET(request: Request) {
+  const { pathname } = new URL(request.url);
+  console.log(`GET request to /api/auth/${pathname.split('/').pop()}: NextAuth not configured.`);
+  return NextResponse.json(
+    { error: `NextAuth feature not configured for this path: ${pathname}` },
+    { status: 404 }
+  );
 }
 
-export async function POST(request: NextRequest) {
-  return handler(request);
+export async function POST(request: Request) {
+  const { pathname } = new URL(request.url);
+  console.log(`POST request to /api/auth/${pathname.split('/').pop()}: NextAuth not configured.`);
+  return NextResponse.json(
+    { error: `NextAuth feature not configured for this path: ${pathname}` },
+    { status: 404 }
+  );
 }
