@@ -9,7 +9,7 @@ function generateAccessToken() {
   return crypto.randomBytes(32).toString('hex');
 }
 
-export async function POST(request: Request) {
+export async function POST() {
   try {
     const sessionCookie = (await cookies()).get('session')?.value;
     if (!sessionCookie) {
@@ -26,7 +26,7 @@ export async function POST(request: Request) {
     const accessToken = generateAccessToken();
     
     // Mettre à jour le token d'accès de l'utilisateur
-    const updatedUser = await prisma.user.update({
+    await prisma.user.update({
       where: { id: userId },
       data: { accessToken },
     });
@@ -110,7 +110,7 @@ export async function PUT(request: Request) {
 }
 
 // Récupérer la liste des accès
-export async function GET(request: Request) {
+export async function GET() {
   try {
     const sessionCookie = (await cookies()).get('session')?.value;
     if (!sessionCookie) {
@@ -201,6 +201,40 @@ export async function DELETE(request: Request) {
     });
   } catch (error) {
     console.error('Erreur lors de la suppression de l\'accès:', error);
+    return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
+  }
+}
+
+export async function PATCH(request: Request) {
+  const sessionCookie = (await cookies()).get('session')?.value;
+
+  if (!sessionCookie) {
+    return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+  }
+
+  const session = await decrypt(sessionCookie);
+  const userId = session?.userId;
+
+  if (!userId) {
+    return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
+  }
+
+  try {
+    const data = await request.json();
+
+    await prisma.user.update({
+      where: { id: userId },
+      data: {
+        isInvisible: data.isInvisible,
+      },
+    });
+
+    return NextResponse.json({
+      message: 'Paramètres mis à jour avec succès',
+      isInvisible: data.isInvisible,
+    });
+  } catch (error) {
+    console.error('Erreur lors de la mise à jour des paramètres:', error);
     return NextResponse.json({ error: 'Erreur serveur' }, { status: 500 });
   }
 }

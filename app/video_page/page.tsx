@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { AiOutlineLike, AiFillLike, AiOutlineDislike, AiFillDislike } from "react-icons/ai";
 import { MdSubscriptions, MdOutlineSubscriptions } from "react-icons/md";
 import Navbar from "@/components/navbar";
+import Image from 'next/image';
 
 interface Video {
   id: string;
@@ -116,9 +117,11 @@ function VideoPageContent() {
 
               <div className="flex items-center mt-4 mb-6">
                 <div className="flex items-center">
-                  <img
+                  <Image
                     src="/Photo_profile_light_mode.png"
                     alt="Profile"
+                    width={48}
+                    height={48}
                     className="w-12 h-12 rounded-full mr-4 cursor-pointer"
                     onClick={() => router.push(`/user/${encodeURIComponent(selectedVideo.username)}`)}
                   />

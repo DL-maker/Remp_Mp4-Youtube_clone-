@@ -1,17 +1,25 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server';
 import { cookies } from 'next/headers';
 import { decrypt } from '@/app/_lib/session';
 import { prisma } from '@/lib/prisma';
 
+// Fonction helper pour retirer une propriété de l'objet
+function omit<T extends object, K extends keyof T>(obj: T, key: K): Omit<T, K> {
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  const { [key]: _unused, ...rest } = obj;
+  return rest;
+}
+
 export async function GET(
-  request: Request,
-  { params }: { params: { username: string } }
+  _request: NextRequest,
+  context: { params: Promise<{ username: string }> }
 ) {
   try {
-    const { searchParams } = new URL(request.url);
+    // Résoudre le Promise pour obtenir params
+    const { username } = await context.params;
+    const { searchParams } = new URL(_request.url);
     const accessToken = searchParams.get('accessToken');
-    const username = params.username;
-    
+
     // Récupérer l'utilisateur du profil
     const profileUser = await prisma.user.findUnique({
       where: { username },
@@ -32,8 +40,7 @@ export async function GET(
     if (profileUser.isInvisible) {
       // Vérifier si un token d'accès valide est fourni
       if (accessToken && accessToken === profileUser.accessToken) {
-        // Token valide, autoriser l'accès
-        const { isInvisible, accessToken: _, ...userData } = profileUser;
+        const userData = omit(profileUser, 'accessToken');
         return NextResponse.json(userData);
       }
 
@@ -55,7 +62,7 @@ export async function GET(
           });
 
           if (hasAccess || requestingUserId === profileUser.id) {
-            const { isInvisible, accessToken: _, ...userData } = profileUser;
+            const userData = omit(profileUser, 'accessToken');
             return NextResponse.json(userData);
           }
         }
@@ -66,7 +73,7 @@ export async function GET(
     }
 
     // Profil public, retourner les données
-    const { isInvisible, accessToken: _, ...userData } = profileUser;
+    const userData = omit(profileUser, 'accessToken');
     return NextResponse.json(userData);
   } catch (error) {
     console.error('Erreur lors de la récupération du profil:', error);

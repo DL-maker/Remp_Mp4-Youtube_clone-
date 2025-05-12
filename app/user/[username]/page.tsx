@@ -91,7 +91,7 @@ export default function UserProfilePage() {
     if (username) {
       fetchUserProfile();
     }
-  }, [username]);
+  }, [username, accessToken]);
 
   if (isLoading) {
     return (

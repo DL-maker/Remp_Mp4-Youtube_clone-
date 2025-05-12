@@ -1,4 +1,4 @@
-import { NextResponse } from 'next/server';
+import { NextResponse, NextRequest } from 'next/server'; // Ajout de NextRequest
 import { cookies } from 'next/headers';
 import { decrypt } from '@/app/_lib/session';
 import { prisma } from '@/lib/prisma';
@@ -13,13 +13,14 @@ const s3Client = new S3Client({
 });
 
 export async function GET(
-  request: Request,
-  { params }: { params: { username: string } }
+  request: NextRequest, // Modifié pour utiliser NextRequest
+  context: { params: Promise<{ username: string }> } // Modification clé ici
 ) {
   try {
+    // Accéder aux paramètres en utilisant await car context.params est une Promise
+    const { username } = await context.params;
     const { searchParams } = new URL(request.url);
     const accessToken = searchParams.get('accessToken');
-    const username = params.username;
 
     // Récupérer l'utilisateur et vérifier son statut
     const user = await prisma.user.findUnique({
@@ -85,10 +86,11 @@ export async function GET(
       obj.Key?.endsWith('.webm') || 
       obj.Key?.endsWith('.avi')
     ).map(obj => ({
-      id: obj.Key,
+      id: obj.Key, // Utiliser obj.Key comme id unique si pertinent
       key: obj.Key!,
-      title: obj.Key!.split('/').pop()!.replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase()),
-      src: `/api/video-stream?key=${encodeURIComponent(obj.Key!)}`,
+      // Amélioration du titre pour remplacer les underscores et capitaliser
+      title: obj.Key!.split('/').pop()!.replace(/_/g, ' ').replace(/\.\w+$/, '').replace(/\b\w/g, c => c.toUpperCase()),
+      src: `/api/video-stream?key=${encodeURIComponent(obj.Key!)}`, // Assurez-vous que cette route existe
       date: obj.LastModified!.toISOString(),
     })) || [];
 
@@ -96,7 +98,7 @@ export async function GET(
   } catch (error) {
     console.error('Erreur lors de la récupération des vidéos:', error);
     return NextResponse.json(
-      { error: 'Erreur lors de la récupération des vidéos' },
+      { error: 'Erreur interne du serveur lors de la récupération des vidéos' },
       { status: 500 }
     );
   }

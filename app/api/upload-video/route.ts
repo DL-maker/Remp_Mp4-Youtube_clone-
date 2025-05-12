@@ -98,9 +98,12 @@ export async function POST(request: Request) {
       username: username 
     });
 
-  } catch (error: any) {
-    console.error('Erreur lors de lupload vers S3:', error);
-    return NextResponse.json({ error: 'Erreur lors de lupload de la vidéo.' }, { status: 500 });
+  } catch (error: unknown) {
+    console.error('Erreur lors de l\'upload vers S3:', error);
+    return NextResponse.json(
+      { error: 'Erreur lors de l\'upload de la vidéo.' },
+      { status: 500 }
+    );
   }
 }
 

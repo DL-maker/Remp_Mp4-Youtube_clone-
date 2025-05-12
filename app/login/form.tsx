@@ -34,7 +34,7 @@ export function SignUpForm() {
         try {
           const errorData = await response.json();
           setState({ error: errorData.error || 'Failed to sign up' });
-        } catch (parseError) {
+        } catch {
           // If parsing fails, provide a generic error message
           setState({ error: 'Failed to sign up' });
         }
@@ -52,9 +52,9 @@ export function SignUpForm() {
       }
       
       // Optionnel: rediriger ou afficher un message de succès
-    } catch (error: any) {
+    } catch (error: unknown) {
       console.error('Signup error:', error);
-      setState({ error: error.message || 'An unexpected error occurred' });
+      setState({ error: error instanceof Error ? error.message : 'An unexpected error occurred' });
     }
   };
 

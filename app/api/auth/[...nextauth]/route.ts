@@ -51,10 +51,10 @@ export async function POST(request: Request) {
       }
     });
     
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Login error:', error);
     return NextResponse.json(
-      { error: error.message || 'An error occurred during login' },
+      { error: error instanceof Error ? error.message : 'An error occurred during login' },
       { status: 500 }
     );
   }

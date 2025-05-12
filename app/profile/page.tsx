@@ -55,16 +55,17 @@ export default function ProfilePage() {
         const profileData = await profileResponse.json();
         const videosData = await videosResponse.json();
 
-        setState(prevState => ({
-          ...prevState,
-          ...profileData,
-          videos: videosData.videos
-        }));
-      } catch (error) {
-        setState(prevState => ({
-          ...prevState,
-          error: "Erreur lors du chargement du profil"
-        }));
+        setState({
+          userId: profileData.id,
+          username: profileData.username,
+          email: profileData.email,
+          createdAt: profileData.createdAt,
+          stats: profileData.stats,
+          videos: videosData,
+        });
+      } catch (error: unknown) {
+        console.error('Error fetching profile:', error);
+        setState({ error: error instanceof Error ? error.message : 'Failed to fetch profile' });
       }
     };
 
@@ -261,8 +262,8 @@ export default function ProfilePage() {
                   {isUploading ? "Téléchargement..." : "Publier la vidéo"}
                 </button>
 
-                {uploadProgress > 0 && <p className="mt-2">Progression de l'upload: {uploadProgress}%</p>}
-                {uploadError && <p className="mt-2 text-red-500">Erreur d'upload: {uploadError}</p>}
+                {uploadProgress > 0 && <p className="mt-2">Progression de l&apos;upload: {uploadProgress}%</p>}
+                {uploadError && <p className="mt-2 text-red-500">Erreur d&apos;upload: {uploadError}</p>}
                 {uploadSuccess && <p className="mt-2 text-green-500">Upload réussi!</p>}
               </div>
 

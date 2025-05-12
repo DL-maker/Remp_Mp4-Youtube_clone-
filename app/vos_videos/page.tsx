@@ -42,7 +42,7 @@ function generateRandomData() {
 
 const VosVideosPage = () => {
   const [isOpen, setIsOpen] = useState(false);
-  const [data, setData] = useState(generateRandomData());
+  const [data] = useState(generateRandomData());
   const [videos, setVideos] = useState<
     Array<{ id: number; filename: string; date: string; type: string; url: string; size?: number }>
   >([]);
