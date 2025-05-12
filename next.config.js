@@ -1,9 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
   reactStrictMode: true,
-  experimental: {
-    appDir: true,
-  },
   images: {
     domains: ['thispersondoesnotexist.com']
   },
@@ -19,12 +16,6 @@ const nextConfig = {
         ],
       },
     ];
-  },
-  api: {
-    bodyParser: {
-      sizeLimit: '1mb',
-    },
-    responseLimit: false,
   },
 };
 
