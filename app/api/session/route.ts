@@ -17,7 +17,7 @@ export async function GET() {
   }
 
   const user = await prisma.user.findUnique({
-    where: { id: Number(session.userId) },
+    where: { id: session.userId }, // Removed Number() conversion
     select: {
       id: true,
       username: true,

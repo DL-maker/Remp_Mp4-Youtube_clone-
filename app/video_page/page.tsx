@@ -5,6 +5,19 @@ import { useRouter } from "next/navigation";
 import { AiOutlineLike, AiFillLike, AiOutlineDislike, AiFillDislike } from "react-icons/ai";
 import { MdSubscriptions, MdOutlineSubscriptions } from "react-icons/md";
 import Navbar from "@/components/navbar";
+import Image from 'next/image';
+
+interface Video {
+  id: string;
+  key: string;
+  filename: string;
+  title: string;
+  date: string;
+  type: string;
+  src: string;
+  size: number;
+  username: string;
+}
 
 async function fetchVideoList() {
   try {
@@ -12,12 +25,8 @@ async function fetchVideoList() {
     if (!response.ok) {
       throw new Error(`HTTP error! status: ${response.status}`);
     }
-    const videoFiles = await response.json();
-    return videoFiles.map((name: string) => ({
-      src: `/videos/${name}`,
-      title: name.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
-      key: name,
-    }));
+    const videos: Video[] = await response.json();
+    return videos;
   } catch (error) {
     console.error("Erreur lors de la récupération de la liste des vidéos:", error);
     return [];
@@ -27,8 +36,8 @@ async function fetchVideoList() {
 function VideoPageContent() {
   const router = useRouter();
   const [isOpen, setIsOpen] = useState(false);
-  const [videos, setVideos] = useState<Array<{ src: string; title: string; key: string }>>([]);
-  const [selectedVideo, setSelectedVideo] = useState<{ src: string; title: string; key: string } | null>(null);
+  const [videos, setVideos] = useState<Video[]>([]);
+  const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
   const [isSubscribed, setIsSubscribed] = useState(false);
@@ -46,8 +55,9 @@ function VideoPageContent() {
 
       const searchParams = new URLSearchParams(window.location.search);
       const videoId = searchParams.get("videoId");
+      
       if (videoId) {
-        const video = videoList.find((v: { key: string }) => v.key === videoId);
+        const video = videoList.find((v) => v.key === videoId);
         setSelectedVideo(video || null);
       }
     };
@@ -105,7 +115,30 @@ function VideoPageContent() {
               </video>
               <h1 className="text-3xl font-bold text-gray-800">{selectedVideo.title}</h1>
 
-              {/* Boutons d'interaction */}
+              <div className="flex items-center mt-4 mb-6">
+                <div className="flex items-center">
+                  <Image
+                    src="/Photo_profile_light_mode.png"
+                    alt="Profile"
+                    width={48}
+                    height={48}
+                    className="w-12 h-12 rounded-full mr-4 cursor-pointer"
+                    onClick={() => router.push(`/user/${encodeURIComponent(selectedVideo.username)}`)}
+                  />
+                  <div>
+                    <p 
+                      className="font-semibold text-gray-800 cursor-pointer hover:text-blue-600"
+                      onClick={() => router.push(`/user/${encodeURIComponent(selectedVideo.username)}`)}
+                    >
+                      {selectedVideo.username}
+                    </p>
+                    <p className="text-sm text-gray-500">
+                      {new Date(selectedVideo.date).toLocaleDateString()}
+                    </p>
+                  </div>
+                </div>
+              </div>
+
               <div className="flex items-center justify-between mt-4">
                 <div className="flex space-x-4 items-center">
                   <button
@@ -166,7 +199,7 @@ function VideoPageContent() {
           <div className="space-y-4">
             {videos.map((video) => (
               <div
-                key={video.key}
+                key={video.id}
                 className="cursor-pointer hover:bg-gray-100 p-2 rounded-lg"
                 onClick={() => handleVideoClick(video.key)}
               >
@@ -174,7 +207,10 @@ function VideoPageContent() {
                   <source src={video.src} type="video/mp4" />
                   Votre navigateur ne supporte pas la lecture des vidéos.
                 </video>
-                <p className="mt-2 text-gray-600 font-medium">{video.title}</p>
+                <div className="mt-2">
+                  <p className="text-gray-800 font-medium">{video.title}</p>
+                  <p className="text-sm text-gray-600">{video.username}</p>
+                </div>
               </div>
             ))}
           </div>

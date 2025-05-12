@@ -4,6 +4,7 @@ import { SignupForumSchema } from "@/app/_lib/definitions";
 import bcrypt from 'bcrypt';
 import { prisma } from '@/lib/prisma';
 import { createSession } from "@/app/_lib/session";
+import { Role } from '@prisma/client';
 
 interface SignupSuccess {
   success: true;
@@ -59,8 +60,7 @@ export async function signup(formData: FormData, baseUrl: string): Promise<Signu
 
     // Création de l'utilisateur dans la base de données
     const user = await prisma.user.create({
-
-      data: { username, email, passwordHash: hashedPassword, role: 'USER' },
+      data: { username, email, passwordHash: hashedPassword, role: Role.USER, id: undefined }, // Use the enum value and let Prisma auto-generate the ID
       select: { id: true, username: true, email: true },
     });
 
