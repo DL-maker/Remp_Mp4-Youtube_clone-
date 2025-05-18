@@ -88,8 +88,27 @@ export default function SignInPage() {
   };
 
   const handleLoginSuccess = () => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const redirectUrl = searchParams.get('redirect') || '/';
+    const params = new URLSearchParams(window.location.search);
+    let redirectUrl = params.get('redirect');
+
+    // Validate the redirectyrl
+    if (redirectUrl) {
+      try {
+        const url = new URL(redirectUrl, window.location.origin); // use a base URL to corectly pars relative path
+        // allow only relative paths starting with '/'
+        // disallow absolute URLs or protocol-relative URLs
+        if (url.origin !== window.location.origin || !redirectUrl.startsWith('/') || redirectUrl.startsWith('//')) {
+          console.warn('Invalid redirect URL detected:', redirectUrl);
+          redirectUrl = '/'; // Default to a safe redirect
+        }
+      } catch (e) {
+        console.warn('Error parsing redirect URL:', redirectUrl, e);
+        redirectUrl = '/'; // Default to a safe redirect on error
+      }
+    } else {
+      redirectUrl = '/'; // Default redirect if no parameter is provided
+    }
+
     router.push(redirectUrl);
   };
 
