@@ -56,12 +56,12 @@ export default function ProfilePage() {
         const videosData = await videosResponse.json();
 
         setState({
-          userId: profileData.id,
+          userId: profileData.userId,
           username: profileData.username,
           email: profileData.email,
           createdAt: profileData.createdAt,
           stats: profileData.stats,
-          videos: videosData,
+          videos: videosData.videos,
         });
       } catch (error: unknown) {
         console.error('Error fetching profile:', error);
