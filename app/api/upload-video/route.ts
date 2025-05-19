@@ -14,6 +14,15 @@ const s3Client = new S3Client({
   }
 });
 
+export const config = {
+  api: {
+    // Cela permet de désactiver le parsing body par défaut pour gérer les fichiers
+    bodyParser: {
+      sizeLimit: '85mb', 
+    },
+  },
+};
+
 export async function POST(request: Request) {
   try {
     const formData = await request.formData();
@@ -45,6 +54,17 @@ export async function POST(request: Request) {
 
     if (!videoFile) {
       return NextResponse.json({ error: 'Aucun fichier vidéo sélectionné.' }, { status: 400 });
+    }
+
+    // Vérification de la taille (85 Mo)
+    const MAX_FILE_SIZE = 85 * 1024 * 1024; // 85 Mo en octets
+    if (videoFile.size > MAX_FILE_SIZE) {
+      return NextResponse.json(
+        { 
+          error: `La taille du fichier dépasse la limite de 85 Mo. Taille actuelle: ${(videoFile.size / (1024 * 1024)).toFixed(2)} Mo` 
+        }, 
+        { status: 400 }
+      );
     }
 
     const buffer = await videoFile.arrayBuffer();
@@ -106,9 +126,3 @@ export async function POST(request: Request) {
     );
   }
 }
-
-export const config = {
-  api: {
-    bodyParser: false,
-  },
-};
