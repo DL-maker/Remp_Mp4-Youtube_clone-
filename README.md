@@ -2,7 +2,7 @@
 
 ## Description
 
-**Remp-mp4** est une plateforme innovante qui réplique les fonctionnalités principales de YouTube, y compris les vidéos régulières et les shorts. Construite avec Next.js et Tailwind CSS, elle vous permet de gérer et partager vos vidéos de manière sécurisée et contrôlée, en donnant accès uniquement aux personnes de votre choix via des liens uniques générés pour chaque contenu.
+**Remp-mp4** est une plateforme innovante qui réplique les fonctionnalités principales de YouTube, y compris les vidéos régulières et les shorts. Construite avec Next.js et Tailwind CSS, elle vous permet de gérer et partager vos vidéos de manière sécurisée et contrôlée, en donnant accès uniquement aux personnes de votre choix via des liens uniques pour accedet a votre chaine comme pour un vrai "Youtuber".
 
 ## Fonctionnalités Principales
 
