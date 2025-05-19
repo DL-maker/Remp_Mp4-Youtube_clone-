@@ -74,7 +74,24 @@ export default function ProfilePage() {
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
-    if (file && file.type.includes("video/")) {
+    if (file) {
+      // Vérification du type de fichier
+      if (!file.type.includes("video/")) {
+        setUploadError('Le fichier sélectionné n\'est pas une vidéo.');
+        setVideoFileToUpload(null);
+        return;
+      }
+      
+      // Vérification de la taille (85 Mo en octets = 85 * 1024 * 1024)
+      const MAX_FILE_SIZE = 85 * 1024 * 1024; // 85 Mo en octets
+      if (file.size > MAX_FILE_SIZE) {
+        setUploadError(`La taille du fichier dépasse la limite de 85 Mo. Taille actuelle: ${(file.size / (1024 * 1024)).toFixed(2)} Mo`);
+        setVideoFileToUpload(null);
+        return;
+      }
+      
+      // Le fichier est valide, on le stocke
+      setUploadError(null);
       setVideoFileToUpload(file);
     }
   };
@@ -215,7 +232,7 @@ export default function ProfilePage() {
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Upload une nouvelle vidéo</h2>
                 <div>
                   <label htmlFor="videoInput" className="block text-sm font-medium text-gray-700 mb-2">
-                    Sélectionner un fichier vidéo
+                    Sélectionner un fichier vidéo (max. 85 Mo)
                   </label>
                   <input
                     id="videoInput"
