@@ -530,16 +530,8 @@ const VosVideosPage = () => {
         {activeTab === 'permissions' && (
           <div className="grid grid-cols-1 md:grid-cols-2 gap-8 mb-8">
             <div className="bg-white rounded-xl shadow-lg p-6">
-              <div className="flex justify-between items-center mb-6">
+              <div className="mb-6">
                 <h2 className="text-xl font-semibold text-gray-800">Accès Accordés</h2>
-                <button 
-                  className="px-4 py-2 bg-blue-100 text-blue-700 rounded-lg hover:bg-blue-200 transition-colors flex items-center"
-                >
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
-                  </svg>
-                  Ajouter
-                </button>
               </div>
               
               <div className="space-y-4">
@@ -578,7 +570,24 @@ const VosVideosPage = () => {
             </div>
 
             <div className="bg-white rounded-xl shadow-lg p-6">
-              <h2 className="text-xl font-semibold text-gray-800 mb-6">Accès Reçus</h2>
+              <div className="flex justify-between items-center mb-6">
+                <h2 className="text-xl font-semibold text-gray-800">Accès Reçus</h2>
+                <button 
+                  onClick={() => {
+                    // Stocker un indicateur dans localStorage pour activation du highlight
+                    localStorage.setItem('highlightAccessSection', 'true');
+                    // Rediriger vers la page des paramètres
+                    router.push('/parametre');
+                  }} 
+                  className="p-2 rounded-full bg-blue-100 text-blue-600 hover:bg-blue-200 transition-colors flex items-center justify-center"
+                  title="Utiliser un lien d'accès"
+                >
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 4v16m8-8H4" />
+                  </svg>
+                </button>
+              </div>
+              
               <div className="space-y-4">
                 {receivedAccesses.length > 0 ? (
                   receivedAccesses.map((access) => (

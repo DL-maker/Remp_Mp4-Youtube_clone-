@@ -33,6 +33,35 @@ const SettingsPage = () => {
     loadUserSettings();
   }, []);
 
+  // Ajouter dans le useEffect pour créer l'effet de phare
+  useEffect(() => {
+    // Vérifier si on doit mettre en surbrillance la section
+    const shouldHighlight = localStorage.getItem('highlightAccessSection') === 'true';
+    
+    if (shouldHighlight) {
+      // Supprimer l'indicateur pour ne pas répéter l'effet lors des visites ultérieures
+      localStorage.removeItem('highlightAccessSection');
+      
+      // Attendre que le DOM soit chargé
+      setTimeout(() => {
+        // Trouver la section à mettre en évidence
+        const accessSection = document.getElementById('access-section');
+        if (accessSection) {
+          // Faire défiler jusqu'à cette section
+          accessSection.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          
+          // Ajouter la classe pour l'effet de phare
+          accessSection.classList.add('highlight-section');
+          
+          // Retirer l'effet après 2 secondes
+          setTimeout(() => {
+            accessSection.classList.remove('highlight-section');
+          }, 2000);
+        }
+      }, 300); // Petit délai pour s'assurer que le DOM est bien chargé
+    }
+  }, []);
+
   const handleLanguageChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     setLanguage(event.target.value);
   };
@@ -262,71 +291,80 @@ const SettingsPage = () => {
               </label>
             </div>
           </div>
+        </div>
 
-          {/* Section de partage du lien d'accès */}
-          {isInvisibleMode && (
-            <div className="mt-6 p-5 bg-blue-50 rounded-lg border border-blue-100 transform transition-all duration-300 ease-in-out">
-              <h3 className="text-lg font-medium text-gray-800 mb-3 flex items-center">
-                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
-                </svg>
-                Lien d&apos;accès à votre profil
-              </h3>
-              <div className="flex items-center space-x-2 mb-4">
-                <input
-                  type="text"
-                  readOnly
-                  value={accessToken}
-                  className="flex-1 p-2 border rounded bg-white shadow-inner text-blue-800 font-mono text-sm"
-                />
-                <button
-                  onClick={() => {
-                    navigator.clipboard.writeText(accessToken);
-                    setMessage({
-                      text: "Lien d'accès copié !",
-                      type: 'success'
-                    });
-                  }}
-                  className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 shadow-sm hover:shadow transition-all duration-300"
-                >
-                  Copier
-                </button>
-                <button
-                  onClick={handleGenerateNewToken}
-                  className="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 shadow-sm hover:shadow transition-all duration-300"
-                >
-                  Générer nouveau
-                </button>
-              </div>
-              
-              <div className="mt-6">
-                <h3 className="text-lg font-medium text-gray-800 mb-3 flex items-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1" />
-                  </svg>
-                  Utiliser un lien d&apos;accès
-                </h3>
-                <div className="flex items-center space-x-2">
-                  <input
-                    type="text"
-                    value={inputAccessToken}
-                    onChange={(e) => setInputAccessToken(e.target.value)}
-                    placeholder="Collez le lien d'accès ici"
-                    className="flex-1 p-2 border rounded shadow-inner focus:ring-2 focus:ring-blue-300 focus:outline-none transition-all duration-200"
-                  />
-                  <button
-                    onClick={handleSubmitAccessToken}
-                    disabled={!inputAccessToken}
-                    className={`px-4 py-2 rounded-lg shadow-sm hover:shadow transition-all duration-300 ${!inputAccessToken 
-                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
-                      : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700'}`}
-                  >
-                    Utiliser
-                  </button>
-                </div>
-              </div>
+        {/* Section de partage du lien d'accès */}
+        {isInvisibleMode && (
+          <div className="mt-6 p-5 bg-blue-50 rounded-lg border border-blue-100 transform transition-all duration-300 ease-in-out">
+            <h3 className="text-lg font-medium text-gray-800 mb-3 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+              </svg>
+              Lien d&apos;accès à votre profil
+            </h3>
+            <div className="flex items-center space-x-2 mb-4">
+              <input
+                type="text"
+                readOnly
+                value={accessToken}
+                className="flex-1 p-2 border rounded bg-white shadow-inner text-blue-800 font-mono text-sm"
+              />
+              <button
+                onClick={() => {
+                  navigator.clipboard.writeText(accessToken);
+                  setMessage({
+                    text: "Lien d'accès copié !",
+                    type: 'success'
+                  });
+                }}
+                className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 shadow-sm hover:shadow transition-all duration-300"
+              >
+                Copier
+              </button>
+              <button
+                onClick={handleGenerateNewToken}
+                className="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 shadow-sm hover:shadow transition-all duration-300"
+              >
+                Générer nouveau
+              </button>
             </div>
-          )}
+          </div>
+        )}
+
+        {/* Section séparée pour utiliser un lien d'accès */}
+        <div id="access-section" className="mb-8 bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100">
+          <h3 className="text-xl font-medium text-gray-700 mb-3 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1" />
+            </svg>
+            Utiliser un lien d&apos;accès
+          </h3>
+          <p className="text-sm text-gray-500 mb-4">
+            Entrez un lien d&apos;accès partagé avec vous pour accéder à un profil invisible
+          </p>
+          <div className="flex items-center space-x-2">
+            <input
+              type="text"
+              value={inputAccessToken}
+              onChange={(e) => setInputAccessToken(e.target.value)}
+              placeholder="Collez le lien d'accès ici"
+              className="flex-1 p-3 border-2 border-gray-300 rounded-lg shadow-inner focus:ring-2 focus:ring-blue-300 focus:outline-none transition-all duration-200"
+            />
+            <button
+              onClick={handleSubmitAccessToken}
+              disabled={!inputAccessToken}
+              className={`px-5 py-3 rounded-lg shadow-sm hover:shadow transition-all duration-300 ${!inputAccessToken 
+                ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700'}`}
+            >
+              <span className="flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 7a2 2 0 012 2m4 0a6 6 0 01-7.743 5.743L11 17H9v2H7v2H4a1 1 0 01-1-1v-2.586a1 1 0 01.293-.707l5.964-5.964A6 6 0 1121 9z" />
+                </svg>
+                Accéder
+              </span>
+            </button>
+          </div>
         </div>
 
         {/* Autres sections avec style amélioré */}
