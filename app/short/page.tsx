@@ -247,7 +247,9 @@ const ShortPage = () => {
         }
       `}</style>
 
-      <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
+      <Navbar toggleColumn={toggleColumn} isOpen={isOpen} isLoggedIn={false} onLogout={function (): void {
+        throw new Error("Function not implemented.");
+      } } />
       <div className="flex-1 flex flex-col items-center justify-center p-4">
         {videos.length > 0 && (
           <div className="relative w-full max-w-4xl">

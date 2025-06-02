@@ -12,7 +12,9 @@ export default function PresseDroits() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
+      <Navbar toggleColumn={toggleColumn} isOpen={isOpen} isLoggedIn={false} onLogout={function (): void {
+        throw new Error('Function not implemented.');
+      } } />
       
       <div className="max-w-4xl mx-auto px-4 py-8">
         <header className="mb-12 text-center">

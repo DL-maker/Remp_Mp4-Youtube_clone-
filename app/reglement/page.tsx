@@ -15,7 +15,9 @@ export default function ReglementDeLaCommunaute() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
+      <Navbar toggleColumn={toggleColumn} isOpen={isOpen} isLoggedIn={false} onLogout={function (): void {
+        throw new Error('Function not implemented.');
+      } } />
 
       {/* Section Principale */}
       <section className="relative bg-gray-800 text-white py-20">

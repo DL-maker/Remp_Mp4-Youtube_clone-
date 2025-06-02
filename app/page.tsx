@@ -37,11 +37,6 @@ export default function Home() {
             <ColumnOfVideo />
           </div>
         </div>
-        {isLoggedIn ? (
-          <button onClick={handleLogout}>Logout</button>
-        ) : (
-          <button onClick={handleLogin}>Login</button>
-        )}
       </div></>
   );
 }

@@ -114,7 +114,9 @@ export default function SignInPage() {
 
   return (
     <>
-      <Navbar toggleColumn={toggleColumn} isOpen={isColumnOpen} />
+      <Navbar toggleColumn={toggleColumn} isOpen={isColumnOpen} isLoggedIn={false} onLogout={function (): void {
+        throw new Error('Function not implemented.');
+      } } />
       <div className="min-h-screen bg-gray-100 flex items-center justify-center px-4">
         <div className="w-full max-w-md space-y-8">
           <h1 className="text-2xl font-bold text-center mb-6">

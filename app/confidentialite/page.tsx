@@ -9,7 +9,9 @@ export default function TermsOfService() {
   };
   return (
     <div className="min-h-screen bg-gray-50 text-gray-800">
-        <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
+        <Navbar toggleColumn={toggleColumn} isOpen={isOpen} isLoggedIn={false} onLogout={function (): void {
+        throw new Error('Function not implemented.');
+      } } />
       <header className="bg-gray-200 text-black py-6">
         <div className="max-w-4xl mx-auto px-4">
           <h1 className="text-3xl font-bold">Politique de Confidentialit&eacute;</h1>

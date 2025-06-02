@@ -67,41 +67,73 @@ const VosVideosPage = () => {
       try {
         // Vérifier d'abord la session
         const sessionResponse = await fetch('/api/session');
+        
+        // Si non authentifié, rediriger vers la page de connexion
         if (sessionResponse.status === 401) {
           router.push('/login');
           return;
         }
-
-        // Si la session est valide, charger les vidéos
-        const videosResponse = await fetch("/api/list-videos?userOnly=true");
-        if (!videosResponse.ok) {
-          throw new Error(await videosResponse.text());
+        
+        // Si la session retourne une erreur interne, gérer l'erreur proprement
+        if (!sessionResponse.ok) {
+          console.error("Erreur lors de la vérification de la session:", await sessionResponse.text());
+          setError("Erreur de connexion au serveur. Veuillez réessayer plus tard.");
+          setLoading(false);
+          return;
         }
 
-        const data = await videosResponse.json();
-        if (Array.isArray(data) && data.length > 0) {
-          setVideos(data.map((video, index) => ({
-            id: index + 1,
-            filename: video.title || `Video ${index + 1}`,
-            date: new Date(video.date).toLocaleDateString(),
-            type: video.type || 'Standard',
-            url: video.src,
-            views: Math.floor(Math.random() * 1000) + 50,
-            likes: Math.floor(Math.random() * 200) + 10
-          })));
-        } else {
-          setError("Aucune vidéo trouvée. Uploadez votre première vidéo!");
+        // Si la session est valide, charger les vidéos avec gestion d'erreur améliorée
+        try {
+          const videosResponse = await fetch("/api/list-videos?userOnly=true");
+          
+          if (!videosResponse.ok) {
+            const errorText = await videosResponse.text();
+            console.error("Erreur lors du chargement des vidéos:", errorText);
+            throw new Error(errorText || "Erreur lors du chargement des vidéos");
+          }
+
+          const data = await videosResponse.json();
+          if (Array.isArray(data) && data.length > 0) {
+            setVideos(data.map((video, index) => ({
+              id: index + 1,
+              filename: video.title || `Video ${index + 1}`,
+              date: new Date(video.date).toLocaleDateString(),
+              type: video.type || 'Standard',
+              url: video.src,
+              views: Math.floor(Math.random() * 1000) + 50,
+              likes: Math.floor(Math.random() * 200) + 10
+            })));
+          } else {
+            setError("Aucune vidéo trouvée. Uploadez votre première vidéo!");
+          }
+        } catch (videoError) {
+          console.error("Erreur lors du chargement des vidéos:", videoError);
+          setError("Impossible de charger vos vidéos. Veuillez réessayer plus tard.");
+          setLoading(false);
+          return;
         }
 
-        // Charger les accès
-        const accessResponse = await fetch('/api/user-settings/access');
-        if (accessResponse.ok) {
-          const accessData = await accessResponse.json();
-          setGrantedAccesses(accessData.grantedAccesses || []);
-          setReceivedAccesses(accessData.receivedAccesses || []);
+        // Charger les accès avec gestion d'erreur séparée
+        try {
+          const accessResponse = await fetch('/api/user-settings/access');
+          if (accessResponse.ok) {
+            const accessData = await accessResponse.json();
+            setGrantedAccesses(accessData.grantedAccesses || []);
+            setReceivedAccesses(accessData.receivedAccesses || []);
+          } else {
+            console.warn("Impossible de charger les données d'accès:", await accessResponse.text());
+            // Ne pas bloquer l'affichage des vidéos si seulement les accès échouent
+            setGrantedAccesses([]);
+            setReceivedAccesses([]);
+          }
+        } catch (accessError) {
+          console.error("Erreur lors du chargement des accès:", accessError);
+          // Ne pas bloquer l'affichage des vidéos si seulement les accès échouent
+          setGrantedAccesses([]);
+          setReceivedAccesses([]);
         }
       } catch (err) {
-        console.error("Erreur lors du chargement des données:", err);
+        console.error("Erreur globale lors du chargement des données:", err);
         setError(err instanceof Error ? err.message : "Une erreur inconnue s'est produite");
       } finally {
         setLoading(false);
