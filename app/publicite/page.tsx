@@ -15,7 +15,9 @@ export default function Publicite() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
+      <Navbar toggleColumn={toggleColumn} isOpen={isOpen} isLoggedIn={false} onLogout={function (): void {
+        throw new Error('Function not implemented.');
+      } } />
 
       {/* Section Principale */}
       <section className="relative text-white py-20 bg-cover bg-center" style={{ backgroundImage: "url('/Advertising.png')" }}>

@@ -32,7 +32,9 @@
 
     return (
         <div className="min-h-screen bg-white">
-        <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
+        <Navbar toggleColumn={toggleColumn} isOpen={isOpen} isLoggedIn={false} onLogout={function (): void {
+                throw new Error('Function not implemented.');
+            } } />
 
         <div className="max-w-6xl mx-auto px-4 py-12">
             <header className="text-center mb-12">

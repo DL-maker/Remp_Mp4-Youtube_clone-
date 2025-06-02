@@ -55,7 +55,9 @@ export default function SubscriptionsPage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
+      <Navbar toggleColumn={toggleColumn} isOpen={isOpen} isLoggedIn={false} onLogout={function (): void {
+        throw new Error("Function not implemented.");
+      } } />
       <div className="p-6">
         <h1 className="text-3xl font-bold text-gray-800 mb-6">Liste des Abonnés</h1>
         <div className="space-y-4">

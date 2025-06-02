@@ -9,7 +9,9 @@ export default function ToutesLesRegles() {
 
   return (
     <div className="min-h-screen bg-white">
-      <Navbar toggleColumn={() => {}} isOpen={false} />
+      <Navbar toggleColumn={() => { } } isOpen={false} isLoggedIn={false} onLogout={function (): void {
+        throw new Error('Function not implemented.');
+      } } />
 
       <section className="py-20">
         <div className="max-w-6xl mx-auto px-4">

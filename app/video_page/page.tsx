@@ -104,7 +104,9 @@ function VideoPageContent() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
+      <Navbar toggleColumn={toggleColumn} isOpen={isOpen} isLoggedIn={false} onLogout={function (): void {
+        throw new Error("Function not implemented.");
+      } } />
       <div className="flex flex-col md:flex-row">
         <div className="flex-1 p-6">
           {selectedVideo ? (

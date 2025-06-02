@@ -39,7 +39,9 @@ export default function EmergencyReportPage() {
   if (isSubmitted) {
     return (
       <div className="min-h-screen flex flex-col bg-gray-100">
-        <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
+        <Navbar toggleColumn={toggleColumn} isOpen={isOpen} isLoggedIn={false} onLogout={function (): void {
+          throw new Error("Function not implemented.");
+        } } />
         <div className="flex-grow flex items-center justify-center">
           <div className="bg-white p-6 rounded-lg shadow-md text-center">
             <h1 className="text-2xl font-bold text-green-600">Signalement envoyé avec succès !</h1>
@@ -52,7 +54,9 @@ export default function EmergencyReportPage() {
 
   return (
     <div className="min-h-screen flex flex-col bg-gray-100">
-      <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
+      <Navbar toggleColumn={toggleColumn} isOpen={isOpen} isLoggedIn={false} onLogout={function (): void {
+        throw new Error("Function not implemented.");
+      } } />
       <div className="flex-grow flex items-center justify-center">
         <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-lg">
           <h1 className="text-2xl font-bold mb-6 text-red-600">Signaler un problème urgent</h1>
