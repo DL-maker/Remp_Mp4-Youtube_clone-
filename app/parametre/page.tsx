@@ -173,32 +173,57 @@ const SettingsPage = () => {
   };
 
   return (
-    <div className="bg-gray-50 min-h-screen">
-      <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
+    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-blue-50">
+      <Navbar 
+        toggleColumn={toggleColumn} 
+        isOpen={isOpen} 
+        isLoggedIn={true} 
+        onLogout={() => router.push('/login')} 
+      />
 
-      <div className="max-w-4xl mx-auto p-8 bg-white shadow-lg rounded-xl mt-16">
-        <h1 className="text-4xl font-semibold text-center text-gray-800 mb-8">Paramètres du Compte</h1>
+      <div className="max-w-4xl mx-auto p-8 bg-white shadow-lg rounded-xl mt-16 border-t-4 border-blue-500">
+        <h1 className="text-4xl font-semibold text-center text-gray-800 mb-8">
+          <span className="bg-gradient-to-r from-blue-600 to-indigo-600 bg-clip-text text-transparent">
+            Paramètres du Compte
+          </span>
+        </h1>
 
         {message && (
-          <div className={`mb-4 p-4 rounded ${
-            message.type === 'success' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-          }`}>
+          <div className={`mb-8 p-4 rounded-lg shadow-sm ${
+            message.type === 'success' ? 'bg-green-100 text-green-800 border-l-4 border-green-500' : 'bg-red-100 text-red-800 border-l-4 border-red-500'
+          } flex items-center`}>
+            <span className={`mr-2 text-xl ${message.type === 'success' ? 'text-green-600' : 'text-red-600'}`}>
+              {message.type === 'success' ? '✓' : '✗'}
+            </span>
             {message.text}
           </div>
         )}
 
         {/* Mode Invisible */}
-        <div className="mb-8">
+        <div className="mb-8 bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100">
           <div className="flex items-center justify-between">
             <div>
-              <label className="text-xl font-medium text-gray-700">
+              <label className="text-xl font-medium text-gray-700 flex items-center">
+                <span className="mr-2">
+                  {isInvisibleMode ? (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                    </svg>
+                  ) : (
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                    </svg>
+                  )}
+                </span>
                 Mode Invisible
               </label>
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 mt-1 ml-8">
                 Lorsque activé, votre profil et vos vidéos ne seront pas visibles sur la page d&apos;accueil
               </p>
             </div>
-            <div className="relative inline-block w-14 h-8">
+            {/* Remplacer le bouton switch actuel par celui-ci */}
+            <div className="relative inline-block w-16 h-8">
               <input
                 type="checkbox"
                 className="sr-only"
@@ -208,29 +233,51 @@ const SettingsPage = () => {
               />
               <label
                 htmlFor="invisibleMode"
-                className={`absolute cursor-pointer inset-0 rounded-full transition-colors duration-300 ${
-                  isInvisibleMode ? 'bg-blue-600' : 'bg-gray-300'
+                className={`absolute cursor-pointer inset-0 rounded-full transition-all duration-300 ${
+                  isInvisibleMode 
+                    ? 'bg-gradient-to-r from-blue-500 to-indigo-600' 
+                    : 'bg-gray-200'
                 }`}
               >
                 <span
-                  className={`absolute inset-y-0 left-0 w-6 h-6 bg-white rounded-full transition-transform duration-300 ${
-                    isInvisibleMode ? 'translate-x-8' : 'translate-x-1'
-                  } flex items-center justify-center mt-1 ml-1`}
-                />
+                  className={`absolute top-1 left-1 right-1 bottom-1 flex items-center transition-all duration-300 ${
+                    isInvisibleMode ? 'justify-end' : 'justify-start'
+                  }`}
+                >
+                  <span 
+                    className="h-6 w-6 bg-white rounded-full shadow-md transform transition-transform duration-300 flex items-center justify-center"
+                  >
+                    {isInvisibleMode ? (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                      </svg>
+                    ) : (
+                      <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.875 18.825A10.05 10.05 0 0112 19c-4.478 0-8.268-2.943-9.543-7a9.97 9.97 0 011.563-3.029m5.858.908a3 3 0 114.243 4.243M9.878 9.878l4.242 4.242M9.88 9.88l-3.29-3.29m7.532 7.532l3.29 3.29M3 3l18 18" />
+                      </svg>
+                    )}
+                  </span>
+                </span>
               </label>
             </div>
           </div>
 
           {/* Section de partage du lien d'accès */}
           {isInvisibleMode && (
-            <div className="mt-4 p-4 bg-gray-50 rounded-lg">
-              <h3 className="text-lg font-medium text-gray-800 mb-2">Lien d&apos;accès à votre profil</h3>
+            <div className="mt-6 p-5 bg-blue-50 rounded-lg border border-blue-100 transform transition-all duration-300 ease-in-out">
+              <h3 className="text-lg font-medium text-gray-800 mb-3 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1" />
+                </svg>
+                Lien d&apos;accès à votre profil
+              </h3>
               <div className="flex items-center space-x-2 mb-4">
                 <input
                   type="text"
                   readOnly
                   value={accessToken}
-                  className="flex-1 p-2 border rounded bg-white"
+                  className="flex-1 p-2 border rounded bg-white shadow-inner text-blue-800 font-mono text-sm"
                 />
                 <button
                   onClick={() => {
@@ -240,31 +287,39 @@ const SettingsPage = () => {
                       type: 'success'
                     });
                   }}
-                  className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                  className="px-4 py-2 bg-gradient-to-r from-blue-500 to-blue-600 text-white rounded-lg hover:from-blue-600 hover:to-blue-700 shadow-sm hover:shadow transition-all duration-300"
                 >
                   Copier
                 </button>
                 <button
                   onClick={handleGenerateNewToken}
-                  className="px-4 py-2 bg-green-500 text-white rounded hover:bg-green-600"
+                  className="px-4 py-2 bg-gradient-to-r from-green-500 to-green-600 text-white rounded-lg hover:from-green-600 hover:to-green-700 shadow-sm hover:shadow transition-all duration-300"
                 >
                   Générer nouveau
                 </button>
               </div>
               
               <div className="mt-6">
-                <h3 className="text-lg font-medium text-gray-800 mb-2">Utiliser un lien d&apos;accès</h3>
+                <h3 className="text-lg font-medium text-gray-800 mb-3 flex items-center">
+                  <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H5a2 2 0 00-2 2v9a2 2 0 002 2h14a2 2 0 002-2V8a2 2 0 00-2-2h-5m-4 0V5a2 2 0 114 0v1" />
+                  </svg>
+                  Utiliser un lien d&apos;accès
+                </h3>
                 <div className="flex items-center space-x-2">
                   <input
                     type="text"
                     value={inputAccessToken}
                     onChange={(e) => setInputAccessToken(e.target.value)}
                     placeholder="Collez le lien d'accès ici"
-                    className="flex-1 p-2 border rounded"
+                    className="flex-1 p-2 border rounded shadow-inner focus:ring-2 focus:ring-blue-300 focus:outline-none transition-all duration-200"
                   />
                   <button
                     onClick={handleSubmitAccessToken}
-                    className="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600"
+                    disabled={!inputAccessToken}
+                    className={`px-4 py-2 rounded-lg shadow-sm hover:shadow transition-all duration-300 ${!inputAccessToken 
+                      ? 'bg-gray-300 text-gray-500 cursor-not-allowed' 
+                      : 'bg-gradient-to-r from-blue-500 to-blue-600 text-white hover:from-blue-600 hover:to-blue-700'}`}
                   >
                     Utiliser
                   </button>
@@ -274,74 +329,137 @@ const SettingsPage = () => {
           )}
         </div>
 
-        {/* Sélecteur de Langue */}
-        <div className="mb-8">
-          <label htmlFor="language" className="block text-xl font-medium text-gray-700 mb-2">
-            Choisissez la langue
-          </label>
-          <select
-            id="language"
-            value={language}
-            onChange={handleLanguageChange}
-            className="p-3 border-2 border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-600"
-          >
-            <option value="fr">Français</option>
-            <option value="en">Anglais</option>
-            <option value="ar">Arabe</option>
-            <option value="ru">Russe</option>
-            <option value="es">Espagnol</option>
-            <option value="zh">Mandarien</option>
-          </select>
-        </div>
+        {/* Autres sections avec style amélioré */}
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8">
+          {/* Sélecteur de Langue */}
+          <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100">
+            <label htmlFor="language" className="block text-xl font-medium text-gray-700 mb-3 flex items-center">
+              <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5h12M9 3v2m1.048 9.5A18.022 18.022 0 016.412 9m6.088 9h7M11 21l5-10 5 10M12.751 5C11.783 10.77 8.07 15.61 3 18.129" />
+              </svg>
+              Choisissez la langue
+            </label>
+            <select
+              id="language"
+              value={language}
+              onChange={handleLanguageChange}
+              className="p-3 border-2 border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 focus:ring-blue-600 bg-white shadow-sm"
+            >
+              <option value="fr">Français</option>
+              <option value="en">Anglais</option>
+              <option value="ar">Arabe</option>
+              <option value="ru">Russe</option>
+              <option value="es">Espagnol</option>
+              <option value="zh">Mandarien</option>
+            </select>
+          </div>
 
-        {/* Switch pour activer/désactiver MUX */}
-        <div className="mb-8 flex items-center">
-          <label htmlFor="mux" className="text-xl font-medium text-gray-700 mr-4">
-            Activer MUX or a link to another invisible mode
-          </label>
-          <input
-            type="checkbox"
-            id="mux"
-            checked={isMuxEnabled}
-            onChange={handleMuxChange}
-            className="h-6 w-6 rounded-full bg-blue-600 checked:bg-blue-700 transition-colors"
-          />
+          {/* Switch pour MUX */}
+          <div className="bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100">
+            <div className="flex justify-between items-center mb-2">
+              <label htmlFor="mux" className="text-xl font-medium text-gray-700 flex items-center">
+                <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19.428 15.428a2 2 0 00-1.022-.547l-2.387-.477a6 6 0 00-3.86.517l-.318.158a6 6 0 01-3.86.517L6.05 15.21a2 2 0 00-1.806.547M8 4h8l-1 1v5.172a2 2 0 00.586 1.414l5 5c1.26 1.26.367 3.414-1.415 3.414H4.828c-1.782 0-2.674-2.154-1.414-3.414l5-5A2 2 0 009 10.172V5L8 4z" />
+                </svg>
+                Activer MUX
+              </label>
+              <div className="relative inline-block w-16 h-8">
+                <input
+                  type="checkbox"
+                  id="mux"
+                  checked={isMuxEnabled}
+                  onChange={handleMuxChange}
+                  className="sr-only"
+                />
+                <label
+                  htmlFor="mux"
+                  className={`absolute cursor-pointer inset-0 rounded-full transition-all duration-300 ${
+                    isMuxEnabled 
+                      ? 'bg-gradient-to-r from-blue-500 to-indigo-600' 
+                      : 'bg-gray-200'
+                  }`}
+                >
+                  <span
+                    className={`absolute top-1 left-1 right-1 bottom-1 flex items-center transition-all duration-300 ${
+                      isMuxEnabled ? 'justify-end' : 'justify-start'
+                    }`}
+                  >
+                    <span 
+                      className="h-6 w-6 bg-white rounded-full shadow-md transform transition-transform duration-300 flex items-center justify-center"
+                    >
+                      {isMuxEnabled ? (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-indigo-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                        </svg>
+                      ) : (
+                        <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 text-gray-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                        </svg>
+                      )}
+                    </span>
+                  </span>
+                </label>
+              </div>
+            </div>
+            <p className="text-sm text-gray-500">
+              Active les fonctionnalités avancées de streaming
+            </p>
+          </div>
         </div>
 
         {/* Input pour entrer l'URL de l'API */}
-        <div className="mb-8">
-          <label htmlFor="api-url" className="block text-xl font-medium text-gray-700 mb-2">
-            URL de l&apos;API or link to another invisible mode
+        <div className="mb-8 bg-white p-6 rounded-xl shadow-sm hover:shadow-md transition-all duration-300 border border-gray-100">
+          <label htmlFor="api-url" className="block text-xl font-medium text-gray-700 mb-3 flex items-center">
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 mr-2 text-blue-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
+            </svg>
+            URL de l&apos;API
           </label>
           <input
             type="text"
             id="api-url"
             value={apiUrl}
             onChange={handleApiChange}
-            className={`p-3 border-2 border-gray-300 rounded-lg w-full focus:outline-none focus:ring-2 ${
-              isMuxEnabled ? "text-black bg-white focus:ring-blue-600" : "text-gray-500 bg-gray-200 focus:ring-gray-400"
+            className={`p-3 border-2 rounded-lg w-full focus:outline-none focus:ring-2 transition-all duration-200 ${
+              isMuxEnabled 
+              ? "text-black bg-white border-gray-300 focus:ring-blue-600 focus:border-blue-500" 
+              : "text-gray-500 bg-gray-100 border-gray-200 cursor-not-allowed"
             }`}
             placeholder="Entrez l'URL de l'API"
-            disabled={!isMuxEnabled}  // Désactive l'input si MUX n'est pas activé
+            disabled={!isMuxEnabled}
           />
+          <p className="text-xs text-gray-500 mt-2 ml-1">
+            {isMuxEnabled 
+              ? "Format attendu: https://api.exemple.com/v1" 
+              : "Activez MUX pour configurer l'API"}
+          </p>
         </div>
 
-        {/* Bouton de suppression de compte */}
-        <div className="mb-8 text-center">
+        {/* Boutons d'action */}
+        <div className="flex flex-col md:flex-row justify-between items-center space-y-4 md:space-y-0 md:space-x-4">
           <button
             onClick={handleDeleteAccount}
-            className="bg-red-600 text-white py-3 px-6 rounded-lg shadow-md hover:bg-red-700 transition-colors"
+            className="w-full md:w-auto bg-gradient-to-r from-red-500 to-red-600 text-white py-3 px-6 rounded-full shadow-md hover:from-red-600 hover:to-red-700 transition-all duration-300 flex items-center justify-center"
           >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
+            </svg>
             Supprimer mon compte
           </button>
-        </div>
-
-        {/* Bouton de sauvegarde */}
-        <div className="text-center">
+          
           <button
-            onClick={() => alert("Paramètres sauvegardés")}
-            className="bg-blue-600 text-white py-3 px-6 rounded-lg shadow-md hover:bg-blue-700 transition-colors"
+            onClick={() => {
+              alert("Paramètres sauvegardés");
+              setMessage({
+                text: "Vos paramètres ont été sauvegardés avec succès",
+                type: 'success'
+              });
+            }}
+            className="w-full md:w-auto bg-gradient-to-r from-blue-500 to-indigo-600 text-white py-3 px-8 rounded-full shadow-md hover:from-blue-600 hover:to-indigo-700 transition-all duration-300 flex items-center justify-center"
           >
+            <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+            </svg>
             Sauvegarder les Paramètres
           </button>
         </div>
