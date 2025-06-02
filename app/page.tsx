@@ -13,10 +13,6 @@ export default function Home() {
     setIsOpen(!isOpen);
   };
 
-  const handleLogin = () => {
-    setIsLoggedIn(true);
-  };
-
   const handleLogout = () => {
     // Add your logout logic here, e.g., clear cookies, session, etc.
     setIsLoggedIn(false); // Update isLoggedIn state

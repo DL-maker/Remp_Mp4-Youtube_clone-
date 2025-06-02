@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/navbar';
 import Image from 'next/image';
-import { useSearchParams } from 'next/navigation';
 
 interface ProfileState {
   userId?: string;
@@ -205,9 +204,6 @@ export default function ProfilePage() {
     );
   }
 
-  const searchParams = useSearchParams();
-  const videoId = searchParams.get('videoId');
-
   return (
     <div className="min-h-screen bg-gradient-to-b from-gray-100 to-blue-50">
       <Navbar 
@@ -322,7 +318,7 @@ export default function ProfilePage() {
                   ) : (
                     // Message si aucune vidéo n'est disponible
                     <div className="col-span-2 text-center py-8 bg-gray-50 rounded-lg">
-                      <p className="text-gray-500">Vous n'avez pas encore de vidéos</p>
+                      <p className="text-gray-500">Vous n&apos;avez pas encore de vidéos</p>
                     </div>
                   )}
                   
@@ -454,12 +450,4 @@ export default function ProfilePage() {
       </div>
     </div>
   );
-}
-
-export function VideoPage() {
-  const searchParams = useSearchParams();
-  const videoId = searchParams.get('videoId');
-  
-  // Utiliser videoId pour afficher la vidéo correspondante
-  // ...
 }

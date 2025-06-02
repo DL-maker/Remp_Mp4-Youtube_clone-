@@ -119,19 +119,6 @@ const Navbar: React.FC<NavbarProps> = ({ toggleColumn, isOpen, isLoggedIn: props
     };
   }, []);
 
-  // À ajouter dans les endroits où le nom d'utilisateur est mis à jour
-  // Par exemple, après une connexion réussie ou modification du profil
-  const updateUsernameGlobally = (newUsername: string) => {
-    // Mettre à jour le localStorage
-    localStorage.setItem('username', newUsername);
-    
-    // Émettre un événement personnalisé pour notifier les autres composants
-    const event = new CustomEvent('usernameChanged', { 
-      detail: { username: newUsername } 
-    });
-    window.dispatchEvent(event);
-  };
-
   return (
     <>
       <nav className="bg-white shadow-sm">

@@ -14,8 +14,6 @@ import {
   Area
 } from "recharts";
 import Navbar from "@/components/navbar";
-import Image from "next/image";
-import videoPlaceholder from '@/public/video-placeholder.jpg'; // Ajoutez cette image à votre dossier public
 
 interface AccessUser {
   username: string;
@@ -285,7 +283,7 @@ const VosVideosPage = () => {
           <div className="bg-white rounded-xl shadow-md p-6 border-l-4 border-green-500 transform transition-transform hover:scale-105 duration-300">
             <div className="flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium text-gray-500">J'aime Totaux</p>
+                <p className="text-sm font-medium text-gray-500">J&apos;aime Totaux</p>
                 <p className="text-3xl font-bold text-gray-800">{getTotalLikes().toLocaleString()}</p>
               </div>
               <div className="p-3 bg-green-50 rounded-full">
@@ -336,7 +334,7 @@ const VosVideosPage = () => {
                   : 'text-gray-500 hover:text-gray-700 hover:border-gray-300'
               }`}
             >
-              Permissions d'Accès
+              Permissions d&apos;Accès
             </button>
           </nav>
         </div>
@@ -442,7 +440,7 @@ const VosVideosPage = () => {
 
         {activeTab === 'analytics' && (
           <div className="bg-white rounded-xl shadow-lg p-6 mb-8">
-            <h2 className="text-xl font-semibold text-gray-800 mb-4">Statistiques d'audience</h2>
+            <h2 className="text-xl font-semibold text-gray-800 mb-4">Statistiques d&apos;audience</h2>
             
             {/* Graphiques */}
             <div className="grid grid-cols-1 xl:grid-cols-2 gap-8 mb-8">
