@@ -181,7 +181,7 @@ export default function ProfilePage() {
   }
 
   return (
-    <div className="min-h-screen bg-gray-50">
+    <div className="min-h-screen bg-gradient-to-b from-gray-100 to-blue-50">
       <Navbar 
         toggleColumn={toggleColumn} // Replace with your actual toggleColumn function
         isOpen={isOpen}          // Replace with your actual isOpen state
@@ -195,7 +195,7 @@ export default function ProfilePage() {
             <div className="text-gray-500 text-center">Loading profile...</div>
           ) : (
             <>
-              <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
+              <div className="bg-white rounded-lg shadow-lg p-6 mb-6 border-l-4 border-blue-500">
                 <div className="flex items-center gap-6">
                   <div className="w-32 h-32 bg-gray-200 rounded-full overflow-hidden">
                     <Image
@@ -211,7 +211,7 @@ export default function ProfilePage() {
                       <h1 className="text-2xl font-bold text-gray-900">{state.username}</h1>
                       <button
                         onClick={() => setIsEditing(!isEditing)}
-                        className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition"
+                        className="px-4 py-2 bg-gradient-to-r from-blue-500 to-indigo-500 text-white rounded-full hover:from-blue-600 hover:to-indigo-600 transition-all duration-300 shadow-sm hover:shadow-md"
                       >
                         {isEditing ? 'Close' : 'Edit Profile'}
                       </button>
@@ -224,27 +224,27 @@ export default function ProfilePage() {
                 </div>
 
                 <div className="grid grid-cols-3 gap-4 mt-8">
-                  <div className="bg-gray-50 p-4 rounded-lg text-center">
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg text-center shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200">
                     <div className="text-xl font-bold text-gray-900">0</div>
                     <div className="text-gray-600">Video</div>
                   </div>
-                  <div className="bg-gray-50 p-4 rounded-lg text-center">
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg text-center shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200">
                     <div className="text-xl font-bold text-gray-900">0</div>
                     <div className="text-gray-600">Likes</div>
                   </div>
-                  <div className="bg-gray-50 p-4 rounded-lg text-center">
+                  <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg text-center shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200">
                     <div className="text-xl font-bold text-gray-900">0</div>
                     <div className="text-gray-600">Abonner</div>
                   </div>
                 </div>
               </div>
 
-              <div className="bg-white rounded-lg shadow-lg p-6 mt-8">
+              <div className="bg-white rounded-lg shadow-lg p-6 mt-8 border-t-2 border-indigo-200">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Mes Vidéos</h2>
                 {state.videos && state.videos.length > 0 ? (
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {state.videos.map((video, index) => (
-                      <div key={index} className="bg-gray-50 rounded-lg overflow-hidden">
+                      <div key={index} className="bg-gray-50 rounded-lg overflow-hidden shadow-md hover:shadow-lg transition-all duration-300 transform hover:-translate-y-1">
                         <video
                           className="w-full aspect-video object-cover"
                           src={video.url}
@@ -263,7 +263,7 @@ export default function ProfilePage() {
                 )}
               </div>
 
-              <div className="bg-white rounded-lg shadow-lg p-6 mt-8">
+              <div className="bg-white rounded-lg shadow-lg p-6 mt-8 border-t-2 border-indigo-200">
                 <h2 className="text-xl font-bold text-gray-900 mb-4">Upload une nouvelle vidéo</h2>
                 <div>
                   <label htmlFor="videoInput" className="block text-sm font-medium text-gray-700 mb-2">
@@ -309,7 +309,7 @@ export default function ProfilePage() {
                 <button
                   onClick={handleUpload}
                   disabled={isUploading || !videoFileToUpload}
-                  className="mt-6 px-4 py-2 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-700 disabled:opacity-50"
+                  className="mt-6 px-6 py-3 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-lg hover:from-blue-700 hover:to-indigo-700 disabled:opacity-50 transition-all duration-300 shadow-md hover:shadow-lg"
                 >
                   {isUploading ? "Téléchargement..." : "Publier la vidéo"}
                 </button>
