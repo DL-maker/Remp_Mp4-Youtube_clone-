@@ -63,6 +63,11 @@ export default function ProfilePage() {
           stats: profileData.stats,
           videos: videosData.videos,
         });
+
+        if (profileData.username) {
+          localStorage.setItem('username', profileData.username);
+          localStorage.setItem('isLoggedIn', 'true');
+        }
       } catch (error: unknown) {
         console.error('Error fetching profile:', error);
         setState({ error: error instanceof Error ? error.message : 'Failed to fetch profile' });
@@ -141,6 +146,31 @@ export default function ProfilePage() {
     }
   };
 
+  const handleLogout = async () => {
+    try {
+      // Call the logout API endpoint
+      const response = await fetch('/api/auth/logout', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+      });
+      
+      if (response.ok) {
+        // Clear any user data from localStorage
+        localStorage.removeItem('username');
+        localStorage.removeItem('isLoggedIn');
+        
+        // Redirect to home page after successful logout
+        router.push('/');
+      } else {
+        console.error('Logout failed');
+      }
+    } catch (error) {
+      console.error('Error during logout:', error);
+    }
+  };
+
   if (state.error) {
     return (
       <>
@@ -152,7 +182,12 @@ export default function ProfilePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar toggleColumn={toggleColumn} isOpen={isOpen} isLoggedIn={!!state.userId} />
+      <Navbar 
+        toggleColumn={toggleColumn} // Replace with your actual toggleColumn function
+        isOpen={isOpen}          // Replace with your actual isOpen state
+        isLoggedIn={true}       // Replace with your actual isLoggedIn state
+        onLogout={handleLogout} // Pass the handleLogout function
+      />
 
       <div className="py-8">
         <div className="max-w-4xl mx-auto px-4">

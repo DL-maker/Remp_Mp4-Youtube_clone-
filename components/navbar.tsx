@@ -9,19 +9,18 @@ import logo from '@/public/Logo_light_mode.png'; // Ensure you have a high-resol
 interface NavbarProps {
   toggleColumn: () => void;
   isOpen: boolean;
-  isLoggedIn: boolean; // Add isLoggedIn to the props
+  isLoggedIn: boolean;
+  onLogout: () => void; // Add a callback function for logout
 }
 
-const Navbar: React.FC<NavbarProps> = ({ toggleColumn, isOpen, isLoggedIn }) => {
+const Navbar: React.FC<NavbarProps> = ({ toggleColumn, isOpen, isLoggedIn, onLogout }) => {
   const columnRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
   
   const handleLogout = () => {
-    // Instead of setting the local state, you'll need to call a function
-    // provided by the parent component to update the parent's state.
-    // For example, if the parent has a function called `onLogout`, you would call it here:
-    // onLogout();
-    router.push('/');
+    // Call the onLogout function passed from the parent component
+    onLogout();
+    router.push('/login'); // Redirect to the login page after logout
   };
 
   useEffect(() => {
@@ -76,7 +75,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleColumn, isOpen, isLoggedIn }) => 
             </div>
             
             <div className="flex items-center space-x-4">
-              <Link href="/profile" prefetch={false}>
+              <Link href="/profile" prefetch={false} className="flex items-center space-x-2">
                 <Image
                   src={"https://thispersondoesnotexist.com"}
                   alt="Profile"
@@ -84,17 +83,23 @@ const Navbar: React.FC<NavbarProps> = ({ toggleColumn, isOpen, isLoggedIn }) => 
                   height={40}
                   className="rounded-full h-10 w-10 object-cover cursor-pointer"
                 />
+                {isLoggedIn && (
+                  <span className="text-sm font-medium">
+                    {/* Display username here - you'll need to pass this from parent components */}
+                    {window.localStorage.getItem('username') || 'Utilisateur'}
+                  </span>
+                )}
               </Link>
               {isLoggedIn ? (
                 <button 
                   onClick={handleLogout}
-                  className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                  className="px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition"
                 >
                   Déconnecter
                 </button>
               ) : (
                 <Link href="/login" prefetch={false}> 
-                  <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+                  <button className="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition">
                     Connexion
                   </button>
                 </Link>
