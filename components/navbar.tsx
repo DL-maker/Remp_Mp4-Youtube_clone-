@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useRef, useEffect } from 'react';
+import React, {useRef, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -9,11 +9,49 @@ import logo from '@/public/Logo_light_mode.png'; // Ensure you have a high-resol
 interface NavbarProps {
   toggleColumn: () => void;
   isOpen: boolean;
+  isLoggedIn: boolean;
+  onLogout: () => void; // Add a callback function for logout
 }
 
-const Navbar: React.FC<NavbarProps> = ({ toggleColumn, isOpen }) => {
+const Navbar: React.FC<NavbarProps> = ({ toggleColumn, isOpen, isLoggedIn: propsIsLoggedIn, onLogout }) => {
   const columnRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  const [username, setUsername] = useState('Utilisateur');
+  // Utiliser un état local pour gérer l'authentification
+  const [authState, setAuthState] = useState(false); // Démarrer à false pour éviter un flash "connecté"
+  
+  // Au chargement, vérifier l'état d'authentification stocké
+  useEffect(() => {
+    // Vérifier si l'utilisateur est explicitement déconnecté
+    const savedAuthState = localStorage.getItem('authState');
+    if (savedAuthState === 'logged_out') {
+      // Forcer l'état déconnecté, indépendamment des props
+      setAuthState(false);
+    } else if (savedAuthState === 'logged_in' || propsIsLoggedIn) {
+      // Considérer connecté si localStorage indique connecté OU si props indique connecté
+      setAuthState(true);
+      // Sauvegarder l'état connecté
+      localStorage.setItem('authState', 'logged_in');
+    }
+  }, [propsIsLoggedIn]);
+
+  const handleLogout = () => {
+    // 1. Marquer explicitement comme déconnecté dans localStorage
+    localStorage.setItem('authState', 'logged_out');
+    
+    // 2. Nettoyer les autres données d'authentification
+    localStorage.removeItem('username');
+    localStorage.removeItem('token'); // si vous utilisez un token
+    
+    // 3. Mettre à jour l'état local
+    setAuthState(false);
+    
+    // 4. Appeler la fonction de déconnexion du parent
+    onLogout();
+    
+    // 5. Rediriger vers la page de connexion
+    router.push('/login');
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -32,6 +70,54 @@ const Navbar: React.FC<NavbarProps> = ({ toggleColumn, isOpen }) => {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isOpen, toggleColumn]);
+
+  // Améliorons la gestion du nom d'utilisateur
+  useEffect(() => {
+    // Cette fonction s'exécutera côté client uniquement
+    const fetchAndSetUsername = () => {
+      // Priorité 1: Récupérer depuis le localStorage
+      const storedUsername = localStorage.getItem('username');
+      
+      if (storedUsername) {
+        setUsername(storedUsername);
+        return;
+      }
+      
+      // Priorité 2: Si pas trouvé dans localStorage, essayer de récupérer depuis l'API
+      fetch('/api/user/me')
+        .then(response => {
+          if (response.ok) return response.json();
+          throw new Error('Failed to fetch user data');
+        })
+        .then(data => {
+          if (data && data.username) {
+            setUsername(data.username);
+            // Mettre à jour le localStorage pour les futurs chargements
+            localStorage.setItem('username', data.username);
+          }
+        })
+        .catch(err => {
+          console.error("Erreur lors de la récupération du nom d'utilisateur:", err);
+          // Garder la valeur par défaut 'Utilisateur' si tout échoue
+        });
+    };
+    
+    fetchAndSetUsername();
+    
+    // Mettre en place un écouteur d'événement pour les mises à jour du nom d'utilisateur entre pages
+    window.addEventListener('usernameChanged', (e) => {
+      const newUsername = (e as CustomEvent).detail?.username;
+      if (newUsername) {
+        setUsername(newUsername);
+        localStorage.setItem('username', newUsername);
+      }
+    });
+    
+    return () => {
+      // Nettoyer l'écouteur d'événement
+      window.removeEventListener('usernameChanged', () => {});
+    };
+  }, []);
 
   return (
     <>
@@ -67,7 +153,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleColumn, isOpen }) => {
             </div>
             
             <div className="flex items-center space-x-4">
-              <Link href="/profile" prefetch={false}>
+              <Link href="/profile" prefetch={false} className="flex items-center space-x-2">
                 <Image
                   src={"https://thispersondoesnotexist.com"}
                   alt="Profile"
@@ -75,12 +161,26 @@ const Navbar: React.FC<NavbarProps> = ({ toggleColumn, isOpen }) => {
                   height={40}
                   className="rounded-full h-10 w-10 object-cover cursor-pointer"
                 />
+                {authState && (
+                  <span className="text-sm font-medium">
+                    {username}
+                  </span>
+                )}
               </Link>
-              <Link href="/login" prefetch={false}> 
-                <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
-                  Connexion
+              {authState ? (
+                <button 
+                  onClick={handleLogout}
+                  className="px-4 py-2 bg-red-500 text-white rounded-full hover:bg-red-600 transition"
+                >
+                  Déconnecter
                 </button>
-              </Link>
+              ) : (
+                <Link href="/login" prefetch={false}> 
+                  <button className="px-4 py-2 bg-blue-500 text-white rounded-full hover:bg-blue-600 transition">
+                    Connexion
+                  </button>
+                </Link>
+              )}
             </div>
           </div>
         </div>

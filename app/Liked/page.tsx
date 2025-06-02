@@ -33,7 +33,9 @@ const LikedVideosPage = () => {
 
   return (
     <div className="p-4">
-        <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
+        <Navbar toggleColumn={toggleColumn} isOpen={isOpen} isLoggedIn={false} onLogout={function (): void {
+        throw new Error("Function not implemented.");
+      } } />
       <h1 className="text-2xl font-bold mb-4 r">Vidéos Likées</h1>
 
       {likedVideos.length === 0 ? (
