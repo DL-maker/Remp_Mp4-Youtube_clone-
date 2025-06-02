@@ -9,11 +9,20 @@ import logo from '@/public/Logo_light_mode.png'; // Ensure you have a high-resol
 interface NavbarProps {
   toggleColumn: () => void;
   isOpen: boolean;
+  isLoggedIn: boolean; // Add isLoggedIn to the props
 }
 
-const Navbar: React.FC<NavbarProps> = ({ toggleColumn, isOpen }) => {
+const Navbar: React.FC<NavbarProps> = ({ toggleColumn, isOpen, isLoggedIn }) => {
   const columnRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
+  
+  const handleLogout = () => {
+    // Instead of setting the local state, you'll need to call a function
+    // provided by the parent component to update the parent's state.
+    // For example, if the parent has a function called `onLogout`, you would call it here:
+    // onLogout();
+    router.push('/');
+  };
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
@@ -76,11 +85,20 @@ const Navbar: React.FC<NavbarProps> = ({ toggleColumn, isOpen }) => {
                   className="rounded-full h-10 w-10 object-cover cursor-pointer"
                 />
               </Link>
-              <Link href="/login" prefetch={false}> 
-                <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
-                  Connexion
+              {isLoggedIn ? (
+                <button 
+                  onClick={handleLogout}
+                  className="px-4 py-2 bg-red-500 text-white rounded-lg hover:bg-red-600 transition"
+                >
+                  Déconnecter
                 </button>
-              </Link>
+              ) : (
+                <Link href="/login" prefetch={false}> 
+                  <button className="px-4 py-2 bg-blue-500 text-white rounded-lg hover:bg-blue-600 transition">
+                    Connexion
+                  </button>
+                </Link>
+              )}
             </div>
           </div>
         </div>

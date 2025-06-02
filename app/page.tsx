@@ -16,7 +16,7 @@ export default function Home() {
     <><Head>
       <title>My Page Title</title> {/* Add title here */}
     </Head><div className="relative flex flex-col">
-        <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
+        <Navbar toggleColumn={toggleColumn} isOpen={isOpen} isLoggedIn={false} />
         <div className="flex">
           <div className="flex-1 bg-white">
             <ColumnOfVideo />
