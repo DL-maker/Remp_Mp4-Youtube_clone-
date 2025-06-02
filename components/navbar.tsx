@@ -1,6 +1,6 @@
 'use client';
 
-import React, {useRef, useEffect } from 'react';
+import React, {useRef, useEffect, useState } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { useRouter } from 'next/navigation';
@@ -16,7 +16,8 @@ interface NavbarProps {
 const Navbar: React.FC<NavbarProps> = ({ toggleColumn, isOpen, isLoggedIn, onLogout }) => {
   const columnRef = useRef<HTMLDivElement>(null);
   const router = useRouter();
-  
+  const [username, setUsername] = useState('Utilisateur');
+
   const handleLogout = () => {
     // Call the onLogout function passed from the parent component
     onLogout();
@@ -40,6 +41,14 @@ const Navbar: React.FC<NavbarProps> = ({ toggleColumn, isOpen, isLoggedIn, onLog
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, [isOpen, toggleColumn]);
+
+  useEffect(() => {
+    // Ce code s'exécute uniquement côté client
+    const storedUsername = localStorage.getItem('username');
+    if (storedUsername) {
+      setUsername(storedUsername);
+    }
+  }, []);
 
   return (
     <>
@@ -85,8 +94,7 @@ const Navbar: React.FC<NavbarProps> = ({ toggleColumn, isOpen, isLoggedIn, onLog
                 />
                 {isLoggedIn && (
                   <span className="text-sm font-medium">
-                    {/* Display username here - you'll need to pass this from parent components */}
-                    {window.localStorage.getItem('username') || 'Utilisateur'}
+                    {username}
                   </span>
                 )}
               </Link>

@@ -96,7 +96,9 @@ export default function UserProfilePage() {
   if (isLoading) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
+        <Navbar toggleColumn={toggleColumn} isOpen={isOpen} isLoggedIn={false} onLogout={function (): void {
+          throw new Error('Function not implemented.');
+        } } />
         <div className="flex justify-center items-center h-[calc(100vh-64px)]">
           <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500"></div>
         </div>
@@ -107,7 +109,9 @@ export default function UserProfilePage() {
   if (error) {
     return (
       <div className="min-h-screen bg-gray-50">
-        <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
+        <Navbar toggleColumn={toggleColumn} isOpen={isOpen} isLoggedIn={false} onLogout={function (): void {
+          throw new Error('Function not implemented.');
+        } } />
         <div className="flex flex-col justify-center items-center h-[calc(100vh-64px)]">
           <div className="bg-red-100 text-red-800 p-6 rounded-lg text-center max-w-md">
             <h2 className="text-xl font-semibold mb-2">Profil non accessible</h2>
@@ -131,7 +135,9 @@ export default function UserProfilePage() {
 
   return (
     <div className="min-h-screen bg-gray-50">
-      <Navbar toggleColumn={toggleColumn} isOpen={isOpen} />
+      <Navbar toggleColumn={toggleColumn} isOpen={isOpen} isLoggedIn={false} onLogout={function (): void {
+        throw new Error('Function not implemented.');
+      } } />
       <div className="py-8">
         <div className="max-w-4xl mx-auto px-4">
           <div className="bg-white rounded-lg shadow-lg p-6 mb-6">
