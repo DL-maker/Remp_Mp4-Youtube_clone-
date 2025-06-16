@@ -5,25 +5,18 @@ import { useRouter } from "next/navigation";
 import Navbar from "@/components/navbar";
 import Image from "next/image";
 
-async function fetchSubscribers() {
-  // Simule une requête API pour obtenir les abonnés
-  return [
-    { 
-      name: "Alice Dupont", 
-      videoKey: "L'evenement du numerique en sante Damien Bancal.mp4", 
-      videoTitle: "Introduction to React" 
-    },
-    { 
-      name: "Bob Martin", 
-      videoKey: "RECYCLER votre VIEUX PC en SERVEUR MULTI-TÂCHES.mp4", 
-      videoTitle: "Next.js Basics" 
-    },
-    { 
-      name: "Clara Smith", 
-      videoKey: "ThePour.mp4", 
-      videoTitle: "Advanced TypeScript" 
-    },
-  ];
+async function fetchSubscriptions() {
+  try {
+    const response = await fetch('/api/subscriptions');
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    const data = await response.json();
+    return data.subscriptions || [];
+  } catch (error) {
+    console.error('Erreur lors de la récupération des abonnements:', error);
+    return [];
+  }
 }
 
 export default function SubscriptionsPage() {
@@ -40,13 +33,12 @@ export default function SubscriptionsPage() {
   const toggleColumn = () => {
     setIsOpen(!isOpen);
   };
-
   useEffect(() => {
-    const loadSubscribers = async () => {  // Fonction asynchrone pour charger les abonnés
-      const data = await fetchSubscribers(); // Appel de la fonction fetchSubscribers
-      setSubscribers(data); // Mise à jour de l'état subscribers avec les données obtenues
+    const loadSubscriptions = async () => {
+      const data = await fetchSubscriptions();
+      setSubscribers(data);
     };
-    loadSubscribers();
+    loadSubscriptions();
   }, []);
 
   const handleVideoClick = (videoKey: string) => { // Fonction pour gérer le clic sur une vidéo
@@ -54,12 +46,12 @@ export default function SubscriptionsPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50">
-      <Navbar toggleColumn={toggleColumn} isOpen={isOpen} isLoggedIn={false} onLogout={function (): void {
-        throw new Error("Function not implemented.");
-      } } />
+    <div className="min-h-screen bg-gray-50">      <Navbar toggleColumn={toggleColumn} isOpen={isOpen} isLoggedIn={true} onLogout={() => {
+        // Rediriger vers la page de connexion
+        router.push('/login');
+      }} />
       <div className="p-6">
-        <h1 className="text-3xl font-bold text-gray-800 mb-6">Liste des Abonnés</h1>
+        <h1 className="text-3xl font-bold text-gray-800 mb-6">Mes Abonnements</h1>
         <div className="space-y-4">
           {subscribers.map((subscriber) => (
             <div 
