@@ -152,29 +152,60 @@ export async function GET() {
         channel: {
           select: {
             username: true,
-            email: true,
-            videos: {
-              take: 1, // Prendre la vidéo la plus récente
-              orderBy: { createdAt: 'desc' },
-              select: {
-                title: true,
-                url: true
-              }
-            }
+            email: true
           }
         }
       },
       orderBy: { createdAt: 'desc' }
     });
 
+    // Pour chaque abonnement, récupérer la dernière vidéo depuis S3
+    const subscriptionsWithVideos = await Promise.all(
+      subscriptions.map(async (sub) => {
+        try {
+          // Récupérer les vidéos de cet utilisateur depuis S3
+          const videosResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/users/${encodeURIComponent(sub.channel.username)}/videos`);
+          
+          if (videosResponse.ok) {
+            const videosData = await videosResponse.json();
+            const latestVideo = videosData.videos && videosData.videos.length > 0 
+              ? videosData.videos[0] // La première vidéo (la plus récente)
+              : null;
+
+            return {
+              id: sub.id,
+              name: sub.channel.username,
+              videoKey: latestVideo?.key || '',
+              videoTitle: latestVideo ? 
+                (latestVideo.key.split('/').pop()?.replace(/\.[^/.]+$/, '') || 'Vidéo sans titre') 
+                : 'Aucune vidéo',
+              createdAt: sub.createdAt
+            };
+          } else {
+            // Si on ne peut pas récupérer les vidéos, retourner sans vidéo
+            return {
+              id: sub.id,
+              name: sub.channel.username,
+              videoKey: '',
+              videoTitle: 'Aucune vidéo',
+              createdAt: sub.createdAt
+            };
+          }
+        } catch (error) {
+          console.error(`Erreur lors de la récupération des vidéos pour ${sub.channel.username}:`, error);
+          return {
+            id: sub.id,
+            name: sub.channel.username,
+            videoKey: '',
+            videoTitle: 'Aucune vidéo',
+            createdAt: sub.createdAt
+          };
+        }
+      })
+    );
+
     return NextResponse.json({
-      subscriptions: subscriptions.map(sub => ({
-        id: sub.id,
-        name: sub.channel.username,
-        videoKey: sub.channel.videos[0]?.url || '',
-        videoTitle: sub.channel.videos[0]?.title || 'Aucune vidéo',
-        createdAt: sub.createdAt
-      }))
+      subscriptions: subscriptionsWithVideos
     });
   } catch (error) {
     console.error('Erreur lors de la récupération des abonnements:', error);
