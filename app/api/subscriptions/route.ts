@@ -145,14 +145,21 @@ export async function GET() {
       return NextResponse.json({ error: 'Non authentifié' }, { status: 401 });
     }
 
-    // Récupérer tous les abonnements de l'utilisateur
+    // Récupérer tous les abonnements de l'utilisateur, en excluant complètement les utilisateurs invisibles
     const subscriptions = await prisma.subscription.findMany({
-      where: { subscriberId: userId },
+      where: { 
+        subscriberId: userId,
+        channel: {
+          isInvisible: false  // Exclure complètement tous les utilisateurs invisibles
+        }
+      },
       include: {
         channel: {
           select: {
+            id: true,
             username: true,
-            email: true
+            email: true,
+            isInvisible: true
           }
         }
       },
@@ -163,13 +170,13 @@ export async function GET() {
     const subscriptionsWithVideos = await Promise.all(
       subscriptions.map(async (sub) => {
         try {
-          // Récupérer les vidéos de cet utilisateur depuis S3
+          // Récupérer les vidéos de l'utilisateur (tous les utilisateurs ici sont visibles)
           const videosResponse = await fetch(`${process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'}/api/users/${encodeURIComponent(sub.channel.username)}/videos`);
           
           if (videosResponse.ok) {
             const videosData = await videosResponse.json();
             const latestVideo = videosData.videos && videosData.videos.length > 0 
-              ? videosData.videos[0] // La première vidéo (la plus récente)
+              ? videosData.videos[0]
               : null;
 
             return {
@@ -181,16 +188,16 @@ export async function GET() {
                 : 'Aucune vidéo',
               createdAt: sub.createdAt
             };
-          } else {
-            // Si on ne peut pas récupérer les vidéos, retourner sans vidéo
-            return {
-              id: sub.id,
-              name: sub.channel.username,
-              videoKey: '',
-              videoTitle: 'Aucune vidéo',
-              createdAt: sub.createdAt
-            };
           }
+
+          // Si erreur lors de la récupération des vidéos, retourner sans vidéo
+          return {
+            id: sub.id,
+            name: sub.channel.username,
+            videoKey: '',
+            videoTitle: 'Aucune vidéo',
+            createdAt: sub.createdAt
+          };
         } catch (error) {
           console.error(`Erreur lors de la récupération des vidéos pour ${sub.channel.username}:`, error);
           return {
