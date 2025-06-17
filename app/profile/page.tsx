@@ -10,9 +10,10 @@ interface ProfileState {
   email?: string;
   createdAt?: string;
   stats?: {
-    Video: number;
-    likes: number;
-    Abonner: number;
+    videosCount: number;
+    subscribersCount: number;
+    subscriptionsCount: number;
+    likesCount: number;
   };
   error?: string;
   videos?: Array<{
@@ -62,22 +63,21 @@ export default function ProfilePage() {
       document.head.removeChild(style);
     };
   }, []);
-
   useEffect(() => {
     const fetchProfile = async () => {
       try {
-        const [profileResponse, videosResponse] = await Promise.all([
-          fetch('/api/session'),
-          fetch('/api/users/videos')
-        ]);
+        const profileResponse = await fetch('/api/profile');
 
-        if (profileResponse.status === 401 || videosResponse.status === 401) {
+        if (profileResponse.status === 401) {
           router.push('/login');
           return;
         }
 
+        if (!profileResponse.ok) {
+          throw new Error('Erreur lors du chargement du profil');
+        }
+
         const profileData = await profileResponse.json();
-        const videosData = await videosResponse.json();
 
         setState({
           userId: profileData.userId,
@@ -85,7 +85,7 @@ export default function ProfilePage() {
           email: profileData.email,
           createdAt: profileData.createdAt,
           stats: profileData.stats,
-          videos: videosData.videos,
+          videos: profileData.videos,
         });
 
         if (profileData.username) {
@@ -245,20 +245,18 @@ export default function ProfilePage() {
                       Joined {new Date(state.createdAt!).toLocaleDateString()}
                     </p>
                   </div>
-                </div>
-
-                <div className="grid grid-cols-3 gap-4 mt-8">
+                </div>                <div className="grid grid-cols-3 gap-4 mt-8">
                   <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg text-center shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200">
-                    <div className="text-xl font-bold text-gray-900">0</div>
-                    <div className="text-gray-600">Video</div>
+                    <div className="text-xl font-bold text-gray-900">{state.stats?.videosCount || 0}</div>
+                    <div className="text-gray-600">Vidéos</div>
                   </div>
                   <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg text-center shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200">
-                    <div className="text-xl font-bold text-gray-900">0</div>
+                    <div className="text-xl font-bold text-gray-900">{state.stats?.likesCount || 0}</div>
                     <div className="text-gray-600">Likes</div>
                   </div>
                   <div className="bg-gradient-to-r from-blue-50 to-indigo-50 p-4 rounded-lg text-center shadow-sm hover:shadow-md transition-all duration-300 border border-gray-200">
-                    <div className="text-xl font-bold text-gray-900">0</div>
-                    <div className="text-gray-600">Abonner</div>
+                    <div className="text-xl font-bold text-gray-900">{state.stats?.subscribersCount || 0}</div>
+                    <div className="text-gray-600">Abonnés</div>
                   </div>
                 </div>
               </div>

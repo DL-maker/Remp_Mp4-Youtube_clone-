@@ -4,6 +4,7 @@ import React, { useState, useEffect } from 'react';
 import { useRouter, useParams } from 'next/navigation';
 import Image from 'next/image';
 import Navbar from '@/components/navbar';
+import SubscribeButton from '@/components/SubscribeButton';
 
 interface UserProfile {
   id: string;
@@ -23,6 +24,7 @@ export default function UserProfilePage() {
   const [profile, setProfile] = useState<UserProfile | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [subscribersCount, setSubscribersCount] = useState(0);
   const params = useParams();
   const router = useRouter();
   const username = params.username as string;
@@ -79,6 +81,14 @@ export default function UserProfilePage() {
           ...userData,
           videos: videosData.videos
         });
+
+        // Récupérer le nombre d'abonnés
+        const subscribersResponse = await fetch(`/api/subscriptions/count?username=${encodeURIComponent(username)}`);
+        if (subscribersResponse.ok) {
+          const subscribersData = await subscribersResponse.json();
+          setSubscribersCount(subscribersData.subscribersCount);
+        }
+        
       } catch (err) {
         const error = err as Error;
         setError(error.message || 'Une erreur est survenue lors du chargement du profil');
@@ -151,12 +161,9 @@ export default function UserProfilePage() {
                   className="w-full h-full object-cover"
                 />
               </div>
-              <div className="flex-1">
-                <div className="flex justify-between items-center mb-4">
+              <div className="flex-1">                <div className="flex justify-between items-center mb-4">
                   <h1 className="text-2xl font-bold text-gray-900">{profile?.username}</h1>
-                  <button className="px-4 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700 transition">
-                    S&apos;abonner
-                  </button>
+                  <SubscribeButton username={profile?.username || ''} />
                 </div>
                 <p className="text-sm text-gray-500">
                   Membre depuis {profile?.createdAt ? new Date(profile.createdAt).toLocaleDateString() : '...'}
@@ -170,7 +177,7 @@ export default function UserProfilePage() {
                 <div className="text-gray-600">Vidéos</div>
               </div>
               <div className="bg-gray-50 p-4 rounded-lg text-center">
-                <div className="text-xl font-bold text-gray-900">0</div>
+                <div className="text-xl font-bold text-gray-900">{subscribersCount}</div>
                 <div className="text-gray-600">Abonnés</div>
               </div>
               <div className="bg-gray-50 p-4 rounded-lg text-center">
