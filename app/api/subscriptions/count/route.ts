@@ -1,4 +1,6 @@
 import { NextResponse } from 'next/server';
+import { cookies } from 'next/headers';
+import { decrypt } from '@/app/_lib/session';
 import { prisma } from '@/lib/prisma';
 
 export async function GET(request: Request) {
@@ -10,14 +12,46 @@ export async function GET(request: Request) {
       return NextResponse.json({ error: 'Nom d\'utilisateur requis' }, { status: 400 });
     }
 
-    // Trouver l'utilisateur
+    // Trouver l'utilisateur cible
     const user = await prisma.user.findUnique({
       where: { username },
-      select: { id: true }
+      select: { id: true, isInvisible: true }
     });
 
     if (!user) {
       return NextResponse.json({ error: 'Utilisateur non trouvé' }, { status: 404 });
+    }
+
+    // Vérification d'autorisation
+    const sessionCookie = (await cookies()).get('session')?.value;
+    if (!sessionCookie) {
+      // Si l'utilisateur n'est pas connecté, seuls les profils publics peuvent être consultés
+      if (user.isInvisible) {
+        return NextResponse.json({ error: 'Accès refusé' }, { status: 403 });
+      }
+    } else {
+      // Vérifier la session
+      const session = await decrypt(sessionCookie);
+      if (!session?.userId) {
+        return NextResponse.json({ error: 'Session invalide' }, { status: 401 });
+      }
+
+      // Si l'utilisateur cible est invisible et que ce n'est pas lui-même
+      if (user.isInvisible && session.userId !== user.id) {
+        // Vérifier s'il a un accès spécial accordé
+        const hasAccess = await prisma.profileAccess.findFirst({
+          where: {
+            OR: [
+              { granterId: user.id, receiverId: session.userId },
+              { granterId: session.userId, receiverId: user.id }
+            ]
+          }
+        });
+
+        if (!hasAccess) {
+          return NextResponse.json({ error: 'Accès refusé' }, { status: 403 });
+        }
+      }
     }
 
     // Compter les abonnés
