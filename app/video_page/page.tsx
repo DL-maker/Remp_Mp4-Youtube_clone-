@@ -3,9 +3,9 @@
 import React, { useState, useEffect, Suspense } from "react";
 import { useRouter } from "next/navigation";
 import { AiOutlineLike, AiFillLike, AiOutlineDislike, AiFillDislike } from "react-icons/ai";
-import { MdSubscriptions, MdOutlineSubscriptions } from "react-icons/md";
 import Navbar from "@/components/navbar";
 import Image from 'next/image';
+import SubscribeButton from '@/components/SubscribeButton';
 
 interface Video {
   id: string;
@@ -40,7 +40,6 @@ function VideoPageContent() {
   const [selectedVideo, setSelectedVideo] = useState<Video | null>(null);
   const [likes, setLikes] = useState(0);
   const [dislikes, setDislikes] = useState(0);
-  const [isSubscribed, setIsSubscribed] = useState(false);
   const [isLiked, setIsLiked] = useState(false);
   const [isDisliked, setIsDisliked] = useState(false);
 
@@ -70,10 +69,6 @@ function VideoPageContent() {
     setTimeout(() => {
       window.location.reload();
     }, 1000);
-  };
-
-  const toggleSubscription = () => {
-    setIsSubscribed(!isSubscribed);
   };
 
   const handleLike = () => {
@@ -168,26 +163,7 @@ function VideoPageContent() {
                   </button>
                 </div>
 
-                <button
-                  className={`flex items-center text-white px-4 py-2 rounded-lg font-bold shadow-md transition ${
-                    isSubscribed
-                      ? "bg-gray-500 hover:bg-gray-600"
-                      : "bg-red-600 hover:bg-red-700"
-                  }`}
-                  onClick={toggleSubscription}
-                >
-                  {isSubscribed ? (
-                    <>
-                      <MdSubscriptions className="text-2xl mr-2" />
-                      Abonné(e)
-                    </>
-                  ) : (
-                    <>
-                      <MdOutlineSubscriptions className="text-2xl mr-2" />
-                      S&apos;abonner
-                    </>
-                  )}
-                </button>
+                <SubscribeButton username={selectedVideo.username} />
               </div>
             </div>
           ) : (
